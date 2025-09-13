@@ -122,7 +122,7 @@ void rtcTimestampCommandSend() {
     Serial.println();
 // #endif
   // Serial2.write(buffer, size);
-  communicationQueue(buffer, size);
+  communicationSerialQueue(buffer, size);
   Serial.println(F("...sent"));
 }
 

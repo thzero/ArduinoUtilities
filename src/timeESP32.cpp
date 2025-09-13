@@ -70,7 +70,7 @@ void rtcTimestampCommandSend(unsigned long timestamp) {
       Serial.print(buffer[i]);
   Serial.println();
   // Serial2.write(buffer, size);
-  communicationQueue(buffer, size);
+  communicationSerialQueue(buffer, size);
   Serial.println(F("...sent"));
 }
 
