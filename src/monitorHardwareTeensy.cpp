@@ -24,7 +24,7 @@ MonitorHardwareTeensy::MonitorHardwareTeensy() {
 byte MonitorHardwareTeensy::monitorCPUTemp() {
   // float value = 0.0;
 
-  // Converts C to F  --  Error if over 165. It will panic at 170?
+  // // Converts C to F  --  Error if over 165. It will panic at 170?
   // value  = (tempmonGetTemp() * 9.0f / 5.0f) + 32.0f;
 
   // // Serial.printf("cpuTempIndex.a: %d\n", cpuTempIndex);
@@ -50,6 +50,7 @@ byte MonitorHardwareTeensy::monitorCPUTemp() {
 
 
   // _resources->cpuTemp = value;
+  // Serial.printf("monitorCPUTemp3: %f\n", _resources->cpuTemp);
   _resources->cpuTemp = _cpuTemp_filter.filter(tempmonGetTemp());
   // Serial.printf("cpuTemp5: %d\n", _resources->cpuTemp);
 
