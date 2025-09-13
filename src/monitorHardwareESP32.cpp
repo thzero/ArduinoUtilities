@@ -13,9 +13,9 @@ byte MonitorHardwareESP32::monitorCPUTemp() {
 }
 
 byte MonitorHardwareESP32::monitorMemory() {
-  _resources->memoryHeap = esp_get_free_heap_size() / 1000;
-  _resources->memoryHeapInternal = esp_get_free_internal_heap_size() / 1000;
-  _resources->memoryHeapMinimum = esp_get_minimum_free_heap_size() / 1000;
+  _resources->memoryHeap = esp_get_free_heap_size();
+  _resources->memoryHeapInternal = esp_get_free_internal_heap_size();
+  _resources->memoryHeapMinimum = esp_get_minimum_free_heap_size();
 
   return 0;
 }
