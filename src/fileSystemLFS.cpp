@@ -11,7 +11,11 @@ fileSystemLFS::fileSystemLFS() {
 
 File fileSystemLFS::openFile(char* path) {
   // Open the root directory
+#if defined(ESP32)
   File file = LittleFS.open(path);
+#elif defined(TEENSYDUINO)
+  File file = File(); // TODO
+#endif
   if (!file || file.isDirectory()) {
     Serial.printf(F("...failed to open the %s.\n"), path);
     return File();
@@ -22,13 +26,23 @@ File fileSystemLFS::openFile(char* path) {
 
 bool fileSystemLFS::setup() {
   Serial.println(F("\tLittleFS begin..."));
-  if (!LittleFS.begin(false)) {
+#if defined(ESP32)
+  bool results = LittleFS.begin(false);
+#elif defined(TEENSYDUINO)
+  bool results = false;
+#endif
+  if (!results) {
     Serial.println(F("\tLittleFS mount failed"));
     Serial.println(F("\tDid not find filesystem; starting format"));
 
     // format if begin fails
     Serial.println(F("\tLittleFS trying to format..."));
-    if (!LittleFS.begin(true)) {
+#if defined(ESP32)
+    bool results = LittleFS.begin(true);
+#elif defined(TEENSYDUINO)
+    bool results = false;
+#endif
+  if (!results) {
       Serial.println(F("\tLittleFS format failed"));
       Serial.println(F("\tFormatting not possible"));
 
@@ -44,9 +58,17 @@ bool fileSystemLFS::setup() {
 }
 
 long fileSystemLFS::totalBytes() {
+#if defined(ESP32)
   return LittleFS.totalBytes();
+#elif defined(TEENSYDUINO)
+  return 0;
+#endif
 }
 
 long fileSystemLFS::usedBytes() {
+#if defined(ESP32)
   return LittleFS.usedBytes();
+#elif defined(TEENSYDUINO)
+  return 0;
+#endif
 }
