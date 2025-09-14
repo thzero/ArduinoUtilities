@@ -22,43 +22,15 @@ MonitorHardwareTeensy::MonitorHardwareTeensy() {
 }
 
 byte MonitorHardwareTeensy::monitorCPUTemp() {
-  // float value = 0.0;
+  // Serial.printf("monitorCPUTemp3: %f\n", _cpuTemp);
+  _cpuTemp = _cpuTemp_filter.filter(tempmonGetTemp());
+  // Serial.printf("cpuTemp5: %d\n", _cpuTemp);
 
-  // // Converts C to F  --  Error if over 165. It will panic at 170?
-  // value  = (tempmonGetTemp() * 9.0f / 5.0f) + 32.0f;
+  if (_cpuTemp > _cpuTempMax) 
+    _cpuTempMax = _cpuTemp;
 
-  // // Serial.printf("cpuTempIndex.a: %d\n", cpuTempIndex);
-  // cpuTempS[cpuTempIndex] = value; 
-  // // Serial.printf("cpuTemp2: %d\n", cpuTempS[cpuTempIndex]);
-
-  // value = 0.0;
-  // byte cpuTempIndexMaxT = cpuTempComplete ? cpuTempIndexMax : cpuTempIndex + 1;
-  // // Serial.printf("cpuTempIndexMaxT: %d\n", cpuTempIndexMaxT);
-  // for (int i = 0; i < cpuTempIndexMaxT; i++) {
-  //   value += cpuTempS[i];
-  //   // Serial.printf("cpuTempS.%d: %d %d\n", i, cpuTempS[i], value);
-  // }
-  // // Serial.printf("cpuTemp3: %d\n", value);
-  // value = value / cpuTempIndexMax; // average
-  // // Serial.printf("cpuTemp4: %d\n", value);
-
-  // cpuTempIndex = cpuTempIndex + 1;
-  // if (cpuTempIndex == 10) {
-  //   cpuTempComplete = true;
-  //   cpuTempIndex = 0;
-  // }
-
-
-  // _resources->cpuTemp = value;
-  // Serial.printf("monitorCPUTemp3: %f\n", _resources->cpuTemp);
-  _resources->cpuTemp = _cpuTemp_filter.filter(tempmonGetTemp());
-  // Serial.printf("cpuTemp5: %d\n", _resources->cpuTemp);
-
-  if (_resources->cpuTemp > _resources->cpuTempMax) 
-    _resources->cpuTempMax = _resources->cpuTemp;
-
-  // if (_resources->cpuTemp >= 170.0f)
-  if (_resources->cpuTemp >= 77.0f) // ~170F
+  // if (_cpuTemp >= 170.0f)
+  if (_cpuTemp >= 77.0f) // ~170F
     return 1; 
   return 0;
 }
@@ -109,48 +81,18 @@ byte MonitorHardwareTeensy::monitorMemory() {
   // Serial.printf("avail HEAP  %8d b %5d kb\n", heap, heap>>10);
   // Serial.printf("avail PSRAM %8d b %5d kb\n", psram, psram>>10);
 
-  _resources->memoryHeap = heap;
-  _resources->memoryRam = psram;
-  _resources->memoryStack = stack;
-  _resources->memoryHeapKb = heap>>10;
-  _resources->memoryRamKb = psram>>10;
-  _resources->memoryStackKb = stack>>10;
+  _memoryHeap = heap;
+  _memoryRam = psram;
+  _memoryStack = stack;
+  _memoryHeapKb = heap>>10;
+  _memoryRamKb = psram>>10;
+  _memoryStackKb = stack>>10;
 
   return 0;
 }
 
-byte MonitorHardwareTeensy::monitorVoltage(int pin) {
-  // int value = 0;
-  
-  // get the samples
-  // for (int i = 1; i <= 10; i++)  // ten samples
-  //   value = value + analogRead(pin);
-  // value = value / 10; // average
-  // // Serial.printf("voltage: %d\n", value);
-
-  // // Serial.printf("voltageIndex.a: %d\n", voltageIndex);
-  // voltageS[voltageIndex] = value; 
-  // // Serial.printf("voltage2: %d\n", voltageS[voltageIndex]);
-
-  // value = 0;
-  // byte voltageIndexMaxT = voltageComplete ? voltageIndexMax : voltageIndex + 1;
-  // // Serial.printf("voltageIndexMaxT: %d\n", voltageIndexMaxT);
-  // for (int i = 0; i < voltageIndexMaxT; i++) {
-  //   value += voltageS[i];
-  //   // Serial.printf("voltageS.%d: %d %d\n", i, voltageS[i], value);
-  // }
-  // // Serial.printf("voltage3: %d\n", value);
-  // value = value / voltageIndexMax; // average
-  // // Serial.printf("voltage4: %d\n", value);
-
-  // voltageIndex = voltageIndex + 1;
-  // if (voltageIndex == voltageIndexMax) {
-  //   voltageComplete = true;
-  //   voltageIndex = 0;
-  // }
-  // // Serial.println();
-
-  _resources->voltage = _voltage_filter.filter(analogRead(pin));
+byte MonitorHardwareTeensy::monitorVoltage() {
+  _voltage = _voltage_filter.filter(analogRead(_voltagePin));
 
   // float vin = 0.0;
   // if (value < 490) 
@@ -169,11 +111,11 @@ byte MonitorHardwareTeensy::monitorVoltage(int pin) {
   //   // Serial.printf("voltage.vin.2: %f\n", vin);
   // }
   // // Serial.printf("voltage5: %f\n", vin);
-  // _resources->voltage = vin;
+  // _voltage = vin;
 
-  // Serial.printf("voltage: %f\n", _resources->voltage);
-  if (_resources->voltage <= 10.0f) {
-    // Serial.printf("voltage %f is below 10.0%.\n", _resources->voltage);
+  // Serial.printf("voltage: %f\n", _voltage);
+  if (_voltage <= 10.0f) {
+    // Serial.printf("voltage %f is below 10.0%.\n", _voltage);
     return 1;
   }
   // Serial.println("voltage is fine.");
@@ -181,24 +123,30 @@ byte MonitorHardwareTeensy::monitorVoltage(int pin) {
 }
 
 void MonitorHardwareTeensy::setupInternal() {
-  Serial.println(F("Setup monitor..."));
-  Serial.println(F("...monitor finished."));
 }
 
-MonitorHardwareTeensy _monitorHardware;
-MonitorHardwareResourceStruct _monitorHardwareResources;
+// MonitorHardware<MonitorHardwareTeensy> _monitorHardware;
 
-void setupMonitorHardware(uint8_t pin) {
+// void setupMonitorHardware(uint8_t pin) {
+//    // This is accepting input from outside
+//    // file:///D:/users/thzero/Downloads/Schematic_RocketTalk%205.1%20Schematic%20PDF.pdf
+//    // Its taking ground output through a 100k resistor
+//    // Its taking V output from battery through a 300k resistor
+//    // Sending that through the L4941BDT-TR to the VIN through two capcitors 10uF and 4F
+//   pinMode(2, INPUT);
+//   _monitorHardware.setup();
+// }
+
+MonitorHardwareTeensy _monitorHardwareTeensy;
+MonitorHardware _monitorHardware;
+void setupMonitorHardware(uint8_t voltagePin) {
    // This is accepting input from outside
    // file:///D:/users/thzero/Downloads/Schematic_RocketTalk%205.1%20Schematic%20PDF.pdf
    // Its taking ground output through a 100k resistor
    // Its taking V output from battery through a 300k resistor
    // Sending that through the L4941BDT-TR to the VIN through two capcitors 10uF and 4F
-  pinMode(pin, INPUT);
-  _monitorHardware.setup(&_monitorHardwareResources);
-  _monitorHardware.monitorCPUTemp();
-  _monitorHardware.monitorMemory();
-  _monitorHardware.monitorVoltage(0);
+  pinMode(voltagePin, INPUT);
+  _monitorHardware.setup(&_monitorHardwareTeensy, voltagePin);
 }
 
 #endif

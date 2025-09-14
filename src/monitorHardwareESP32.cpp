@@ -13,25 +13,20 @@ byte MonitorHardwareESP32::monitorCPUTemp() {
 }
 
 byte MonitorHardwareESP32::monitorMemory() {
-  _resources->memoryHeap = esp_get_free_heap_size();
-  _resources->memoryHeapInternal = esp_get_free_internal_heap_size();
-  _resources->memoryHeapMinimum = esp_get_minimum_free_heap_size();
+  _memoryHeap = esp_get_free_heap_size();
+  _memoryHeapInternal = esp_get_free_internal_heap_size();
+  _memoryHeapMinimum = esp_get_minimum_free_heap_size();
 
   return 0;
 }
 
-byte MonitorHardwareESP32::monitorVoltage(int pin) {
+byte MonitorHardwareESP32::monitorVoltage() {
   // Voltage in volts not mv, using a 1:1 divider so 500 division.
   _voltage = _voltage_filter.filter(analogReadMilliVolts(10) / 500);
 
-  // memmove(&_voltageRolling[0], &_voltageRolling[1], (_voltageCapacity -1) * sizeof(_voltageRolling[0]));
-  // _voltageRolling[_voltageCapacity - 1] = analogReadMilliVolts(10) / 500;
-
-  _resources->voltage = _voltage;
-
-  // Serial.printf("voltage: %f\n", _resources->voltage);
-  if (_resources->voltage <= 2.0f) {
-    // Serial.printf("voltage %f is below 2.0%.\n", _resources->voltage);
+  // Serial.printf("voltage: %f\n", _voltage);
+  if (_voltage <= 2.0f) {
+    // Serial.printf("voltage %f is below 2.0%.\n", _voltage);
     return 1;
   }
 
@@ -62,14 +57,10 @@ void MonitorHardwareESP32::setupInternal() {
   Serial.println(F("...monitor finished."));
 }
 
-MonitorHardwareESP32 _monitorHardware;
-MonitorHardwareResourceStruct _monitorHardwareResources;
-
+MonitorHardwareESP32 _monitorHardwareESP32;
+MonitorHardware _monitorHardware;
 void setupMonitorHardware() {
-  _monitorHardware.setup(&_monitorHardwareResources);
-  _monitorHardware.monitorCPUTemp();
-  _monitorHardware.monitorMemory();
-  _monitorHardware.monitorVoltage(0);
+  _monitorHardware.setup(&_monitorHardwareESP32, 0);
 }
 
 #endif

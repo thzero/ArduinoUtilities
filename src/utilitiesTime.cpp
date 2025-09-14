@@ -1,6 +1,8 @@
-#include <TimeLib.h>
 #if defined(ESP32)
 #include <ESP32Time.h>
+#include <TimeLib.h>
+#elif defined(TEENSYDUINO)
+#include <TimeLib.h>
 #endif
 
 #include "communicationSerial.h"
