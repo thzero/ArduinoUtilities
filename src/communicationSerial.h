@@ -3,8 +3,8 @@
 
 #include <Arduino.h>
 
-extern int communicationQueue(uint8_t *byteArray, size_t size);
-extern int communicationQueueLoop(unsigned long delta);
-extern bool communicationQueueSerialSetup();
+extern int communicationSerialQueue(uint8_t *byteArray, size_t size);
+extern int communicationSerialLoop(unsigned long delta);
+extern bool communicationSerialSetup();
 
 #endif

@@ -5,27 +5,23 @@
 
 #include <Arduino.h>
 
-#include "ewma.h"
+#include "monitorHardware.h"
 #include "monitorHardwareBase.h"
 
 #define voltage_pinA A9
 
-class MonitorHardwareTeensy : public MonitorHardwareBase {
+class monitorHardwareTeensy : public monitorHardwareBase {
   public:
-    MonitorHardwareTeensy();
-    byte monitorCPUTemp();
-    byte monitorMemory();
-    byte monitorVoltage(int pin);
+    monitorHardwareTeensy();
+    byte monitorCPUTemp() override;
+    byte monitorMemory() override;
+    byte monitorVoltage() override;
     
   protected:
-    void setupInternal();
-    
-  private:
-    ewma _cpuTemp_filter = ewma(0.01); 
-    ewma _voltage_filter = ewma(0.01); 
+    void setupInternal() override; 
 };
 
-extern MonitorHardwareTeensy _monitorHardware;
+extern monitorHardware _monitorHardware;
 
 extern void setupMonitorHardware(uint8_t pin);
 

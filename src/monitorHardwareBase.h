@@ -3,28 +3,14 @@
 
 #include <Arduino.h>
 
-struct MonitorHardwareResourceStruct {
-  float cpuTemp = 0.0;
-  float cpuTempMax = 0.0;
-  int memoryHeap = 0;
-  int memoryHeapKb = 0;
-  int memoryHeapInternal = 0;
-  int memoryHeapInternalKb = 0;
-  int memoryHeapMinimum = 0;
-  int memoryHeapMinimumKb = 0;
-  int memoryRam = 0;
-  int memoryRamKb = 0;
-  int memoryStack = 0;
-  int memoryStackKb = 0;
-  float voltage = 0;
-};
+#include "ewma.h"
 
-class MonitorHardwareBase {
+class monitorHardwareBase {
   public:
-    void setup(MonitorHardwareResourceStruct* resources);
-    byte monitorCPUTemp();
-    byte monitorMemory();
-    byte monitorVoltage(int pin);
+    void setup(uint32_t voltagePin);
+    virtual byte monitorCPUTemp();
+    virtual byte monitorMemory();
+    virtual byte monitorVoltage();
     float cpuTemp();
     float cpuTempMax();
     int memoryHeap();
@@ -39,17 +25,25 @@ class MonitorHardwareBase {
     int memoryStackKb();
     float voltage();
   protected:
-    void setupInternal();
+    virtual void setupInternal();
+    
+    float _cpuTemp = 0.0;
+    float _cpuTempMax = 0.0;
+    int _memoryHeap = 0;
+    int _memoryHeapKb = 0;
+    int _memoryHeapInternal = 0;
+    int _memoryHeapInternalKb = 0;
+    int _memoryHeapMinimum = 0;
+    int _memoryHeapMinimumKb = 0;
+    int _memoryRam = 0;
+    int _memoryRamKb = 0;
+    int _memoryStack = 0;
+    int _memoryStackKb = 0;
+    float _voltage = 0;
+    uint8_t _voltagePin = 0;
 
-    MonitorHardwareResourceStruct* _resources;
-    float cpuTempS[10];
-    byte cpuTempIndex = 0;
-    byte cpuTempIndexMax = 10;
-    bool cpuTempComplete = false;
-    int voltageS[10];
-    byte voltageIndex = 0;
-    byte voltageIndexMax = 10;
-    bool voltageComplete = false;
+    ewma _cpuTemp_filter = ewma(0.01); 
+    ewma _voltage_filter = ewma(0.01); 
 };
 
 #endif

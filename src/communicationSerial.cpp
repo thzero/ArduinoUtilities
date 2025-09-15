@@ -3,6 +3,7 @@
 #if defined(ESP32)
 #include <mutex>
 #endif
+#include <SerialTransfer.h>
 #if defined(TEENSYDUINO)
 #include <TeensyThreads.h>
 #endif
@@ -20,6 +21,11 @@ std::mutex serial_mtx;
 Threads::Mutex mutexOutput;
 #endif
 
+struct __attribute__((packed)) STRUCT {
+  char z;
+  float y;
+} testStruct;
+
 struct CommuicationQueueMessageStruct {
   uint8_t buffer[1024];
   size_t size;
@@ -27,7 +33,7 @@ struct CommuicationQueueMessageStruct {
 
 CircularQueue<CommuicationQueueMessageStruct, COMMUNICATION_QUEUE_LENGTH> queueing;
 
-int communicationQueue(uint8_t *byteArray, size_t size) {
+int communicationSerialQueue(uint8_t *byteArray, size_t size) {
 #if defined(TEENSYDUINO)
   Threads::Scope m(mutexOutput); // lock on creation
 #endif
@@ -58,7 +64,7 @@ int communicationQueue(uint8_t *byteArray, size_t size) {
   return 1;
 }
 
-int communicationQueueLoop(unsigned long delta) {
+int communicationSerialLoop(unsigned long delta) {
 #if defined(TEENSYDUINO)
   Threads::Scope m(mutexOutput); // lock on creation
 #endif
@@ -92,7 +98,7 @@ int communicationQueueLoop(unsigned long delta) {
 #endif
 }
 
-bool communicationQueueSerialSetup() {
+bool communicationSerialSetup() {
   Serial2.begin(115200);
   // Serial2.begin(1000000);
   while(!Serial2);

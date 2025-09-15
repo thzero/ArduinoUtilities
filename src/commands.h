@@ -1,6 +1,8 @@
 #ifndef _COMMANDS_H
 #define _COMMANDS_H
 
+#include <Arduino.h>
+
 typedef void (*DeviceCommandFunctionPtr)(uint8_t commandBuffer[], int commandBufferLength);
 
 struct DeviceCommandFunctionEntry {

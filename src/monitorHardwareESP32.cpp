@@ -5,37 +5,28 @@
 #include <debug.h>
 #include "monitorHardwareESP32.h"
 
-MonitorHardwareESP32::MonitorHardwareESP32() {
+monitorHardwareESP32::monitorHardwareESP32() {
 }
 
-byte MonitorHardwareESP32::monitorCPUTemp() {
+byte monitorHardwareESP32::monitorCPUTemp() {
   return 0;
 }
 
-byte MonitorHardwareESP32::monitorMemory() {
-#ifdef MONITOR_MEMORY
-  _resources->memoryHeap = esp_get_free_heap_size() / 1000;
-  _resources->memoryHeapInternal = esp_get_free_internal_heap_size() / 1000;
-  _resources->memoryHeapMinimum = esp_get_minimum_free_heap_size() / 1000;
-#endif
+byte monitorHardwareESP32::monitorMemory() {
+  _memoryHeap = esp_get_free_heap_size();
+  _memoryHeapInternal = esp_get_free_internal_heap_size();
+  _memoryHeapMinimum = esp_get_minimum_free_heap_size();
 
   return 0;
 }
 
-byte MonitorHardwareESP32::monitorVoltage(int pin) {
-#ifdef MONITOR_VOLTAGE
+byte monitorHardwareESP32::monitorVoltage() {
   // Voltage in volts not mv, using a 1:1 divider so 500 division.
   _voltage = _voltage_filter.filter(analogReadMilliVolts(10) / 500);
 
-  // memmove(&_voltageRolling[0], &_voltageRolling[1], (_voltageCapacity -1) * sizeof(_voltageRolling[0]));
-  // _voltageRolling[_voltageCapacity - 1] = analogReadMilliVolts(10) / 500;
-#endif
-
-  _resources->voltage = _voltage;
-
-  // Serial.printf("voltage: %f\n", _resources->voltage);
-  if (_resources->voltage <= 2.0f) {
-    // Serial.printf("voltage %f is below 2.0%.\n", _resources->voltage);
+  // Serial.printf("voltage: %f\n", _voltage);
+  if (_voltage <= 2.0f) {
+    // Serial.printf("voltage %f is below 2.0%.\n", _voltage);
     return 1;
   }
 
@@ -43,10 +34,9 @@ byte MonitorHardwareESP32::monitorVoltage(int pin) {
   return 0;
 }
 
-void MonitorHardwareESP32::setupInternal() {
+void monitorHardwareESP32::setupInternal() {
   Serial.println(F("Setup monitor..."));
 
-#ifdef MONITOR_VOLTAGE
   Serial.println(F("\t...voltage..."));
   /*
    .. Setup 1:1 ratio voltage divider from VBAT -> Pin 10 -> Pin 6
@@ -58,24 +48,19 @@ void MonitorHardwareESP32::setupInternal() {
   // Just set pin6 to a LOW output and pin10 to an input.  Normally go for more than 33k's
   analogReadResolution(12);
   pinMode(10, INPUT);   
-  pinMode(6, OUTPUT);3
+  pinMode(6, OUTPUT);
   digitalWrite(6, LOW);
   
   _voltage = _voltage_filter.filter(analogReadMilliVolts(10) / 500);
   Serial.println(F("\t...voltage finished"));
-#endif
 
   Serial.println(F("...monitor finished."));
 }
 
-MonitorHardwareESP32 _monitorHardware;
-MonitorHardwareResourceStruct _monitorHardwareResources;
-
+monitorHardwareESP32 _monitorHardwareESP32;
+monitorHardware _monitorHardware;
 void setupMonitorHardware() {
-  _monitorHardware.setup(&_monitorHardwareResources);
-  _monitorHardware.monitorCPUTemp();
-  _monitorHardware.monitorMemory();
-  _monitorHardware.monitorVoltage(0);
+  _monitorHardware.setup(&_monitorHardwareESP32, 0);
 }
 
 #endif
