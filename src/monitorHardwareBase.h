@@ -5,7 +5,7 @@
 
 #include "ewma.h"
 
-class MonitorHardwareBase {
+class monitorHardwareBase {
   public:
     void setup(uint32_t voltagePin);
     virtual byte monitorCPUTemp();
@@ -44,7 +44,6 @@ class MonitorHardwareBase {
 
     ewma _cpuTemp_filter = ewma(0.01); 
     ewma _voltage_filter = ewma(0.01); 
-    // MonitorHardwareResourceStruct* _resources;
 };
 
 #endif

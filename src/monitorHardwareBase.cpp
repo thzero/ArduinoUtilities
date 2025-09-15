@@ -1,88 +1,75 @@
 #include "monitorHardwareBase.h"
 
-void MonitorHardwareBase::setup(uint32_t voltagePin) {
+void monitorHardwareBase::setup(uint32_t voltagePin) {
     _voltagePin = voltagePin;
     setupInternal();
 }
 
-void MonitorHardwareBase::setupInternal() {
+void monitorHardwareBase::setupInternal() {
   Serial.println(F("Setup monitor..."));
   Serial.println(F("...monitor finished."));
 }
 
-byte MonitorHardwareBase::monitorCPUTemp() {
+byte monitorHardwareBase::monitorCPUTemp() {
   return 0;
 }
 
-byte MonitorHardwareBase::monitorMemory() {
+byte monitorHardwareBase::monitorMemory() {
   return 0;
 }
 
-byte MonitorHardwareBase::monitorVoltage() {
+byte monitorHardwareBase::monitorVoltage() {
   return 0;
 }
 
-float MonitorHardwareBase::cpuTemp() {
-    // return _resources->cpuTemp;
+float monitorHardwareBase::cpuTemp() {
     return _cpuTemp;
 }
 
-float MonitorHardwareBase::cpuTempMax() {
-    // return _resources->cpuTempMax;
+float monitorHardwareBase::cpuTempMax() {
     return _cpuTempMax;
 }
 
-int MonitorHardwareBase::memoryHeap() {
-    // return _resources->memoryHeap;
+int monitorHardwareBase::memoryHeap() {
     return _memoryHeap;
 }
 
-int MonitorHardwareBase::memoryHeapKb() {
-    // return _resources->memoryHeap >> 10;
+int monitorHardwareBase::memoryHeapKb() {
     return _memoryHeap >> 10;
 }
 
-int MonitorHardwareBase::memoryHeapInternal() {
-    // return _resources->memoryHeapInternal;
+int monitorHardwareBase::memoryHeapInternal() {
     return _memoryHeapInternal;
 }
 
-int MonitorHardwareBase::memoryHeapInternalKb() {
-    // return _resources->memoryHeapInternal >> 10;
+int monitorHardwareBase::memoryHeapInternalKb() {
     return _memoryHeapInternal >> 10;
 }
 
-int MonitorHardwareBase::memoryHeapMinimum() {
-    // return _resources->memoryHeapMinimum;
+int monitorHardwareBase::memoryHeapMinimum() {
     return _memoryHeapMinimum;
 }
 
-int MonitorHardwareBase::memoryHeapMinimumKb() {
-    // return _resources->memoryHeapMinimum >> 10;
+int monitorHardwareBase::memoryHeapMinimumKb() {
     return _memoryHeapMinimum >> 10;
 }
 
-int MonitorHardwareBase::memoryRam() {
-    // return _resources->memoryRam;
+int monitorHardwareBase::memoryRam() {
     return _memoryRam;
 }
 
-int MonitorHardwareBase::memoryRamKb() {
-    // return _resources->memoryRam >> 10;
+int monitorHardwareBase::memoryRamKb() {
     return _memoryRam >> 10;
 }
 
-int MonitorHardwareBase::memoryStack() {
-    // return _resources->memoryStack;
+int monitorHardwareBase::memoryStack() {
     return _memoryStack;
 }
 
-int MonitorHardwareBase::memoryStackKb() {
-    // return _resources->memoryStack >> 10;
+int monitorHardwareBase::memoryStackKb() {
     return _memoryStack >> 10;
 }
 
-float MonitorHardwareBase::voltage() {
-    // return _resources->voltage;
+float monitorHardwareBase::voltage() {
     return _voltage;
 }

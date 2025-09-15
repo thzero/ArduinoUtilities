@@ -5,14 +5,14 @@
 #include <debug.h>
 #include "monitorHardwareESP32.h"
 
-MonitorHardwareESP32::MonitorHardwareESP32() {
+monitorHardwareESP32::monitorHardwareESP32() {
 }
 
-byte MonitorHardwareESP32::monitorCPUTemp() {
+byte monitorHardwareESP32::monitorCPUTemp() {
   return 0;
 }
 
-byte MonitorHardwareESP32::monitorMemory() {
+byte monitorHardwareESP32::monitorMemory() {
   _memoryHeap = esp_get_free_heap_size();
   _memoryHeapInternal = esp_get_free_internal_heap_size();
   _memoryHeapMinimum = esp_get_minimum_free_heap_size();
@@ -20,7 +20,7 @@ byte MonitorHardwareESP32::monitorMemory() {
   return 0;
 }
 
-byte MonitorHardwareESP32::monitorVoltage() {
+byte monitorHardwareESP32::monitorVoltage() {
   // Voltage in volts not mv, using a 1:1 divider so 500 division.
   _voltage = _voltage_filter.filter(analogReadMilliVolts(10) / 500);
 
@@ -34,7 +34,7 @@ byte MonitorHardwareESP32::monitorVoltage() {
   return 0;
 }
 
-void MonitorHardwareESP32::setupInternal() {
+void monitorHardwareESP32::setupInternal() {
   Serial.println(F("Setup monitor..."));
 
   Serial.println(F("\t...voltage..."));
@@ -57,8 +57,8 @@ void MonitorHardwareESP32::setupInternal() {
   Serial.println(F("...monitor finished."));
 }
 
-MonitorHardwareESP32 _monitorHardwareESP32;
-MonitorHardware _monitorHardware;
+monitorHardwareESP32 _monitorHardwareESP32;
+monitorHardware _monitorHardware;
 void setupMonitorHardware() {
   _monitorHardware.setup(&_monitorHardwareESP32, 0);
 }

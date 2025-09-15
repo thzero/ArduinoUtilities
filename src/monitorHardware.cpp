@@ -1,76 +1,78 @@
 #include "monitorHardware.h"
 
-MonitorHardware::MonitorHardware() {
+monitorHardware::monitorHardware() {
 }
 
-void MonitorHardware::setup(MonitorHardwareBase* instance, uint32_t voltagePin) {
+byte monitorHardware::setup(monitorHardwareBase* instance, uint32_t voltagePin) {
     _instance = instance;
     _instance->setup(voltagePin);
     _instance->monitorCPUTemp();
     _instance->monitorMemory();
     _instance->monitorVoltage();
+
+    return 0;
 }
 
-byte MonitorHardware::monitorCPUTemp() {
+byte monitorHardware::monitorCPUTemp() {
     return _instance->monitorCPUTemp();
 }
 
-byte MonitorHardware::monitorMemory() {
+byte monitorHardware::monitorMemory() {
     return _instance->monitorMemory();
 }
 
-byte MonitorHardware::monitorVoltage() {
+byte monitorHardware::monitorVoltage() {
     return _instance->monitorVoltage();
 }
 
-float MonitorHardware::cpuTemp() {
+float monitorHardware::cpuTemp() {
     return _instance->cpuTemp();
 }
 
-float MonitorHardware::cpuTempMax() {
+float monitorHardware::cpuTempMax() {
     return _instance->cpuTempMax();
 }
 
-int MonitorHardware::memoryHeap() {
+int monitorHardware::memoryHeap() {
     return _instance->memoryHeap();
 }
 
-int MonitorHardware::memoryHeapKb() {
+int monitorHardware::memoryHeapKb() {
     return _instance->memoryHeap();
 }
 
-int MonitorHardware::memoryHeapInternal() {
+int monitorHardware::memoryHeapInternal() {
     return _instance->memoryHeapInternal();
 }
 
-int MonitorHardware::memoryHeapInternalKb() {
+int monitorHardware::memoryHeapInternalKb() {
     return _instance->memoryHeapInternal();
 }
 
-int MonitorHardware::memoryHeapMinimum() {
+int monitorHardware::memoryHeapMinimum() {
     return _instance->memoryHeapMinimum();
 }
 
-int MonitorHardware::memoryHeapMinimumKb() {
+int monitorHardware::memoryHeapMinimumKb() {
     return _instance->memoryHeapMinimum();
 }
 
-int MonitorHardware::memoryRam() {
+int monitorHardware::memoryRam() {
     return _instance->memoryRam();
 }
 
-int MonitorHardware::memoryRamKb() {
+int monitorHardware::memoryRamKb() {
     return _instance->memoryRam();
 }
 
-int MonitorHardware::memoryStack() {
+int monitorHardware::memoryStack() {
     return _instance->memoryStack();
 }
 
-int MonitorHardware::memoryStackKb() {
+int monitorHardware::memoryStackKb() {
     return _instance->memoryStack();
 }
 
-float MonitorHardware::voltage() {
+float monitorHardware::voltage() {
     return _instance->voltage();
 }

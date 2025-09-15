@@ -5,10 +5,10 @@
 
 #include "monitorHardwareBase.h"
 
-class MonitorHardware {
+class monitorHardware {
   public:
-    MonitorHardware();
-    void setup(MonitorHardwareBase* instance, uint32_t voltagePin);
+    monitorHardware();
+    byte setup(monitorHardwareBase* instance, uint32_t voltagePin);
     byte monitorCPUTemp();
     byte monitorMemory();
     byte monitorVoltage();
@@ -26,7 +26,7 @@ class MonitorHardware {
     int memoryStackKb();
     float voltage();
   protected:
-    MonitorHardwareBase* _instance;
+    monitorHardwareBase* _instance;
 };
 
 #endif

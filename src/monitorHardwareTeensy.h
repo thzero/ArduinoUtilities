@@ -10,9 +10,9 @@
 
 #define voltage_pinA A9
 
-class MonitorHardwareTeensy : public MonitorHardwareBase {
+class monitorHardwareTeensy : public monitorHardwareBase {
   public:
-    MonitorHardwareTeensy();
+    monitorHardwareTeensy();
     byte monitorCPUTemp() override;
     byte monitorMemory() override;
     byte monitorVoltage() override;
@@ -21,7 +21,7 @@ class MonitorHardwareTeensy : public MonitorHardwareBase {
     void setupInternal() override; 
 };
 
-extern MonitorHardware _monitorHardware;
+extern monitorHardware _monitorHardware;
 
 extern void setupMonitorHardware(uint8_t pin);
 

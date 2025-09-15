@@ -6,9 +6,9 @@
 #include "monitorHardware.h"
 #include "monitorHardwareBase.h"
 
-class MonitorHardwareESP32 : public MonitorHardwareBase {
+class monitorHardwareESP32 : public monitorHardwareBase {
   public:
-    MonitorHardwareESP32();
+    monitorHardwareESP32();
     byte monitorCPUTemp() override;
     byte monitorMemory() override;
     byte monitorVoltage() override;
@@ -17,7 +17,7 @@ class MonitorHardwareESP32 : public MonitorHardwareBase {
     void setupInternal() override;
 };
 
-extern MonitorHardware _monitorHardware;
+extern monitorHardware _monitorHardware;
 
 extern void setupMonitorHardware();
 
