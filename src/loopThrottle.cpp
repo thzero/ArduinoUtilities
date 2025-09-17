@@ -4,21 +4,20 @@
 loopThrottle::loopThrottle() {
 }
 
-int loopThrottle::determine(unsigned long deltaElapsed, int sampleRate) {
+int loopThrottle::determine(char name, unsigned long deltaElapsed, int sampleRate) {
   unsigned long delta = deltaElapsed + _elapsed;
-  unsigned long samples = (1000 / sampleRate) * 1000; // convert to micros...
+  unsigned long samples = sampleRate * 1000; // convert to micros...
   
 // #ifdef DEBUG
   // if (_countDebug > 1000 * 1000) {
-  //   debug(F(" "));
-  //   debug(F("deltaElapsed"), deltaElapsed);
-  //   debug(F("_elapsed"), _elapsed);
-  //   debug(F("delta"), delta);
-  //   debug(F("sampleRate"), sampleRate);
-  //   debug(F("sampleRate / 60"), ((float)sampleRate / 60));
-  //   debug(F("samples"), samples);
-  //   debug(F("(delta <= samples)"), (delta <= samples));
-  //   _countDebug = 0;
+    // debug(F(" "));
+    // debug(F("deltaElapsed"), deltaElapsed);
+    // debug(F("_elapsed"), _elapsed);
+    // debug(F("delta"), delta);
+    // debug(F("sampleRate"), sampleRate);
+    // debug(F("samples"), samples);
+    // debug(F("(delta <= samples)"), (delta <= samples));
+    // _countDebug = 0;
   // }
 // #endif
 
@@ -31,6 +30,9 @@ int loopThrottle::determine(unsigned long deltaElapsed, int sampleRate) {
   }
 
 // #ifdef DEBUG
+  // debug(F(" "));
+  // debug(F("sample: "), name);
+  // debug(F(" "));
   // _countDebug = 0;
 // #endif
   _elapsed = 0;

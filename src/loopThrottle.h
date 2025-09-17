@@ -4,7 +4,7 @@
 class loopThrottle {
   public:
     loopThrottle();
-    int determine(unsigned long deltaElapsed, int sampleRate);
+    int determine(char name, unsigned long deltaElapsed, int sampleRate);
     void reset();
     
   private:
