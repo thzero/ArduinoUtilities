@@ -25,7 +25,9 @@ char buttonHandlerBase::name() {
 }
 
 void buttonHandlerBase::setup(char name, int pin) {
-  Serial.println(F("\nSetup button..."));
+  Serial.print(F("Setup button '"));
+  Serial.print(name);
+  Serial.println(F("'..."));
   _name = name;
 
   _btn.begin(pin, INPUT_PULLUP);
