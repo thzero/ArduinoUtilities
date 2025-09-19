@@ -4,16 +4,14 @@
 class loopThrottle {
   public:
     loopThrottle();
-    int determine(unsigned long timestamp, int sampleRate);
+    int determine(char name, unsigned long deltaElapsed, int sampleRate);
     void reset();
-    bool signal();
     
   private:
-    int _countDebug;
 // #ifdef DEBUG
-    // int _countDebugI;
+    // int _countDebug;
 // #endif
-    int _delta;
+    int _elapsed;
 };
 
 #endif
