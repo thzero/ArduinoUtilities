@@ -3,7 +3,7 @@
 
 #include <Arduino.h>
 
-extern char* convertTime(unsigned long epochS);
+// extern char* convertTime(unsigned long epochS);
 extern unsigned long rtcGetEpoch();
 extern void rtcInit();
 extern void rtcPrintTime();

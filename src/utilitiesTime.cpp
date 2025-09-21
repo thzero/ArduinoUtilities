@@ -9,11 +9,11 @@
 #include <utilities.h>
 #include <utilitiesTime.h>
 
-char* convertTime(unsigned long epochS) {
-    char buff[32];
-    sprintf(buff, "%02d.%02d.%02d %02d:%02d:%02d", month(epochS), day(epochS), year(epochS), hour(epochS), minute(epochS), second(epochS));
-    return buff;
-}
+// char* convertTime(unsigned long epochS) {
+//     char buff[32];
+//     sprintf(buff, "%02d.%02d.%02d %02d:%02d:%02d", month(epochS), day(epochS), year(epochS), hour(epochS), minute(epochS), second(epochS));
+//     return buff;
+// }
 
 void rtcPrintTimeDigits(int digits) {
   // utility function for digital clock display: prints preceding colon and leading 0
@@ -84,7 +84,8 @@ void rtcTimestampCommandSend(unsigned long timestamp) {
       Serial.print(buffer[i]);
   Serial.println();
   // Serial2.write(buffer, size);
-  communicationSerialQueue(buffer, size);
+  // communicationSerialQueue(buffer, size);
+  // _communicationSerialObj.queue(buffer, size);
   Serial.println(F("...sent"));
 }
 
@@ -136,17 +137,17 @@ void rtcInit() {
 }
 
 void rtcPrintTime() {
+  Serial.print(month());
+  Serial.print(F("/"));
+  Serial.print(day());
+  Serial.print(F("/"));
+  Serial.print(year()); 
+  Serial.print(F(" "));
   rtcPrintTimeDigits(hour());
   Serial.print(F(":"));
   rtcPrintTimeDigits(minute());
   Serial.print(F(":"));
   rtcPrintTimeDigits(second());
-  Serial.print(F(" "));
-  Serial.print(day());
-  Serial.print(F(" "));
-  Serial.print(month());
-  Serial.print(F(" "));
-  Serial.print(year()); 
   Serial.println(); 
 }
 
@@ -199,7 +200,8 @@ void rtcTimestampCommandSend() {
     Serial.println();
 // #endif
   // Serial2.write(buffer, size);
-  communicationSerialQueue(buffer, size);
+  // communicationSerialQueue(buffer, size);
+  _communicationSerialObj.queue(buffer, size);
   Serial.println(F("...sent"));
 }
 
