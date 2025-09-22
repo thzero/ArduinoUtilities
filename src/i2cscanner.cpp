@@ -115,7 +115,7 @@ void scan(TwoWire &myport) {
 
     if (error == 0)
     {
-      Serial.print(F("I2C device found at address 0x"));
+      Serial.print(F("\tI2C device found at address 0x"));
       if (address < 16)
         Serial.print(F("0"));
       Serial.print(address, HEX);
@@ -141,18 +141,21 @@ void scan(TwoWire &myport) {
       errors = true;
     }
   }
-  
+
+#ifdef DEBUG
   if (errors) {
-    Serial.print("Unknown errors at addresses: ");
+    Serial.print("\tUnknown errors at addresses: ");
     Serial.println(errorAddresses);
   }
+#endif
   
   if (devices == 0) {
-    Serial.println(F("No I2C devices found."));
+    Serial.println(F("\tNo I2C devices found."));
     return;
   }
 
   Serial.println(F("...scanning done!"));
+  Serial.println();
 }
 
 void i2CScanner() {
@@ -181,4 +184,5 @@ void i2CScanner() {
 #endif
 
   Serial.println(F("...scanning done!"));
+  Serial.println();
 }
