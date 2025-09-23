@@ -248,41 +248,6 @@ size_t CommunicationSerial::read(CommunicationHandlerFunctionPtr func, unsigned 
 
 //     return communication.size;
 //   }
-//   if (Serial2.available() > 0) { // Check if data is available
-//     //  Serial.println(F("Serial2.available..."));
-//     CommuicationQueueMessageStruct communication;
-
-//     communication.size = Serial2.readBytesUntil(';', communication.buffer, sizeof(1024) - 1);
-// // // #ifdef DEBUG
-//     Serial.println("communication-serial-loop: message size received: ");
-//     Serial.printf("%d\n", communication.size);
-// // // #endif
-
-// // #ifdef DEBUG_SERIAL2
-//     Serial.println("communication-serial-loop: message bytes received: ");
-//     for (size_t i = 0; i < communication.size; i++)
-//       Serial.printf("%d ", communication.buffer[i]);
-//     Serial.println();
-// // #endif
-
-//     // _deviceCommands.interpretBuffer(_bufferSerialInbound, readIndex);
-//     if (func != nullptr)
-//         func(timestamp, delta, communication);
-//   }
-//   if (Serial2.available() > 0) { // Check if data is available
-//     //  Serial.println(F("Serial2.available..."));
-
-//     int readIndex = Serial2.readBytesUntil(';', _bufferSerialInbound, BUFFER_MAX_SIZE - 1);
-
-// // #ifdef DEBUG_SERIAL2
-//     Serial.print(F("Received: "));
-//     for (int i = 0; i < readIndex; i++)
-//       Serial.printf("%d", _bufferSerialInbound[i]);
-//     Serial.println();
-// // #endif
-
-//     memset(_bufferSerialInbound, 0, sizeof(_bufferSerialInbound)); // already done in interpretbuffer
-//   }
   if (Serial2.available() > 0) { // Check if data is available
     //  Serial.println(F("Serial2.available..."));
      CommuicationQueueMessageStruct communication;
