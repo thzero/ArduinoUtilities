@@ -28,7 +28,6 @@ class CommunicationSerial {
     template <typename T>
     int queuePacked(uint8_t command, const T& val, const uint16_t& size = sizeof(T));
     int loop(unsigned long timestamp, unsigned long delta);
-    // size_t read(uint8_t* received, unsigned long timestamp, unsigned long delta, CommunicationHandlerFunctionPtr func);
     size_t read(CommunicationHandlerFunctionPtr func, unsigned long timestamp, unsigned long delta);
     bool setup(unsigned long baud, uint32_t config);
 #if !defined(TEENSYDUINO)

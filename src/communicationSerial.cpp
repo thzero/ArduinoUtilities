@@ -213,7 +213,6 @@ int CommunicationSerial::loop(unsigned long timestamp, unsigned long delta) {
 #endif
 }
 
-// size_t CommunicationSerial::read(uint8_t* received, unsigned long timestamp, unsigned long delta) {
 size_t CommunicationSerial::read(CommunicationHandlerFunctionPtr func, unsigned long timestamp, unsigned long delta) {
 //   if (_transfer.available()) {
 //     CommuicationQueueMessageStruct communication;
