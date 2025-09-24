@@ -2,17 +2,22 @@
 #define _COMMMUNICATION_SERIAL_H
 
 #include <Arduino.h>
-// #include <SerialTransfer.h>
+#include <SerialTransfer.h>
 
 #include <CircularQueue.hpp>
 
 #define COMMUNICATION_QUEUE_LENGTH 5
 #define BUFFER_MAX_SIZE 1024
+#define BUFFER_MAX_MESSAGE_SIZE 1021 // start - command - size - size - bytes - crc - end
+
+const uint8_t MESSAGE_START_BYTE = 0x7E;
+const uint8_t MESSAGE_STOP_BYTE  = 0x81;
 
 struct CommuicationQueueMessageStruct {
-  uint8_t buffer[BUFFER_MAX_SIZE];
-  size_t size;
   uint8_t command;
+  size_t size;
+  uint8_t buffer[BUFFER_MAX_SIZE];
+  uint8_t crc;
 };
 
 typedef void (*CommunicationHandlerFunctionPtr)(unsigned long timestamp, unsigned long deltaElapsed, CommuicationQueueMessageStruct communication);
@@ -37,8 +42,7 @@ class CommunicationSerial {
   private:
     CircularQueue<CommuicationQueueMessageStruct, COMMUNICATION_QUEUE_LENGTH> _queueing;
     
-    uint8_t _bufferSerialInbound[BUFFER_MAX_SIZE];
-    // SerialTransfer _transfer;
+    SerialTransfer _transfer;
 };
 
 extern CommunicationSerial _communicationSerialObj;
