@@ -3,7 +3,7 @@
 
 #include <Arduino.h>
 
-typedef void (*DeviceCommandFunctionPtr)(uint8_t commandBuffer[], int commandBufferLength);
+typedef void (*DeviceCommandFunctionPtr)(uint8_t* commandBuffer, const int commandBufferLength);
 
 struct DeviceCommandFunctionEntry {
     char key;
@@ -40,6 +40,12 @@ class deviceCommands {
     void interpretCommandBuffer();
     void resetCommandBuffer();
     void commandsInterpretBuffer();
+
+    const uint8_t COMMAND_HELP  = 'h';
+    const uint8_t COMMAND_I2CSCANNER = 'i';
+    const uint8_t COMMAND_TEST = 'y';
+
+    const uint8_t COMMAND_STOP_BYTE  = ';';
 };
 
 extern deviceCommands _deviceCommands;

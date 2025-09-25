@@ -128,27 +128,27 @@ void deviceCommands::interpretCommandBuffer() {
 #endif
 
   // help
-  if (command == 'h') {
+  if (command == COMMAND_HELP) {
     interpretCommandBufferHelp();
     return;
   }
 #if defined(DEV) && defined(I2CSCANNER_ENABLED)
   // i2c scanner - debug only
-  if (command == 'i') {
+  if (command == COMMAND_I2CSCANNER) {
     interpretCommandBufferI2CScanner();
     return;
   }
 #endif
 #ifdef DEV
   // test command
-  if (command == 'y') {
+  if (command == COMMAND_TEST) {
     return;
   }
 #endif
 
   DeviceCommandFunctionPtr commandFunc = getCommandAdditionalFunction(command);
   if (commandFunc != NULL) {
-    commandFunc(commandBuffer, commandBufferLength); // Call the function
+    commandFunc(&commandBuffer[1], commandBufferLength); // Call the function, remove the leading 'command'
     return;
   }
 
@@ -238,7 +238,7 @@ bool deviceCommands::readSerial(unsigned long timestamp, unsigned long delta) {
 #endif
 // #endif
 
-    if (readVal == ';') {
+    if (readVal == COMMAND_STOP_BYTE) {
       commandBuffer[commandBufferLength++] = '\0';
 
 // #if defined(DWBUG) && defined(DEBUG_COMMAND)
