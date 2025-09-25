@@ -3,7 +3,7 @@
 
 #include <Arduino.h>
 
-typedef void (*DeviceCommandFunctionPtr)(uint8_t* commandBuffer, const int commandBufferLength);
+typedef void (*DeviceCommandFunctionPtr)(uint8_t* commandBuffer, uint16_t commandBufferLength);
 
 struct DeviceCommandFunctionEntry {
     char key;
