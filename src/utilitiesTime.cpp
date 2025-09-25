@@ -5,6 +5,7 @@
 #include <TimeLib.h>
 #endif
 
+#include "communicationConstants.h"
 #include "communicationSerial.h"
 #include <utilities.h>
 #include <utilitiesTime.h>
@@ -226,7 +227,7 @@ void rtcTimestampCommandSend() {
 // #endif
   // Serial2.write(buffer, size);
   // communicationSerialQueue(buffer, size);
-  _communicationSerialObj.queue(2, buffer, size);
+  _communicationSerialObj.queue(COMMUNICATION_RTC, buffer, size);
   // _communicationSerialObj.queue(2, buffer, size);
   Serial.println(F("...sent"));
 }

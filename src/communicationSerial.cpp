@@ -9,6 +9,8 @@
 #include "communicationSerial.h"
 #include <utilities.h>
 
+#define DEBUG
+
 #if defined(ESP32)
 SemaphoreHandle_t mutex;
 std::mutex serial_mtx;
@@ -18,6 +20,60 @@ Threads::Mutex mutexOutput;
 #endif
 
 CommunicationSerial::CommunicationSerial() {
+}
+
+CommunicationCommandFunctionPtr CommunicationSerial::getCommandFunction(uint16_t command) {
+  // if (commandsHead == NULL)
+  //   return NULL;
+
+  // Serial.print("command: ");
+  // Serial.println(command);
+  auto results = _dict.find(command);
+  if (results != _dict.end()) {
+#ifdef DEBUG
+    Serial.printf("getCommandFunction...found '%d'\n", command);
+#endif
+    CommunicationCommandFunctionEntry *current = _dict.at(command);
+    if (current != nullptr) {
+#ifdef DEBUG
+      Serial.printf("getCommandFunction...did not find '%d'\n", command);
+#endif
+      return current->func;
+    }
+  }
+#ifdef DEBUG
+  else
+    Serial.println("getCommandFunction...did not find it...");
+#endif
+      
+  // CommunicationCommandFunctionEntry *current = commandsHead;
+  // while (current != NULL) {
+  //   // Serial.print("command.current: ");
+  //   // Serial.println(current->command);
+  //     if (current->command != command) {
+  //       current = current->next;
+  //       continue;
+  //     }
+
+  //     return current->func;
+  // }
+
+  return NULL; // command not found
+}
+
+void CommunicationSerial::initCommand(uint16_t command, CommunicationCommandFunctionPtr func) {
+  CommunicationCommandFunctionEntry *item = (CommunicationCommandFunctionEntry *)malloc(sizeof(CommunicationCommandFunctionEntry));
+  item->command = command;
+  item->func = func;
+  item->next = NULL;
+
+  // if (commandsHead == NULL)
+  //   commandsHead = item;
+  // if (commandsLatest != NULL)
+  //   commandsLatest->next = item;
+  // commandsLatest = item;
+
+  _dict.insert(std::make_pair(command, item));
 }
 
 int CommunicationSerial::loop(unsigned long timestamp, unsigned long delta) {
@@ -50,15 +106,6 @@ int CommunicationSerial::loop(unsigned long timestamp, unsigned long delta) {
   Serial.println();
 #endif
 
-  Serial.print("communication-serial-loop: packed message bytes to send: ");
-  for (size_t i = 0; i < message.size; i++)
-      Serial.printf("%d ", message.buffer[i]);
-  Serial.println();
-
-  // uint8_t crcVal = crc.calculate(message.buffer, message.size-1); // account for ending
-  // Serial.println("communication-serial-loop: message crc: ");
-  // Serial.printf("%d\n", crcVal);
-
   // Serial2.write(message.buffer, message.size);
 
   uint16_t sendSize = 0;
@@ -67,7 +114,7 @@ int CommunicationSerial::loop(unsigned long timestamp, unsigned long delta) {
   sendSize = _transfer.txObj(message.command, sizeof(uint8_t)); // Stuff buffer with array
   sendSize = _transfer.txObj(message.size, sizeof(size_t)); // Stuff buffer with array
   sendSize = _transfer.txObj(message.buffer, sendSize, message.size); // Stuff buffer with array
-  _transfer.sendData(sendSize);
+  _transfer.sendData(sendSize, message.command);
 
   memset(message.buffer, 0, BUFFER_MAX_SIZE);
 
@@ -144,12 +191,12 @@ size_t CommunicationSerial::read(CommunicationHandlerFunctionPtr func, unsigned 
     // uint8_t command;
     // uint8_t buffer[BUFFER_MAX_SIZE];
     // size_t size;
-    uint16_t recSize = 0;  // bytes we've processed from the receive buffer
-    recSize = _transfer.rxObj(communication.command, sizeof(uint8_t));
+    communication.command = _transfer.currentCommand();
 #ifdef DEBUG
     Serial.print("communication-serial-loop: message command received: ");
-    Serial.printf("%d\n", communication.command);
+    Serial.printf("%d %d %d\n", communication.command, _transfer.currentCommand(), (communication.command == _transfer.currentCommand()));
 #endif
+    uint16_t recSize = 0;  // bytes we've processed from the receive buffer
     recSize = _transfer.rxObj(communication.size, sizeof(size_t));
 #ifdef DEBUG
     Serial.print("communication-serial-loop: message bytes to receive: ");
@@ -163,7 +210,11 @@ size_t CommunicationSerial::read(CommunicationHandlerFunctionPtr func, unsigned 
     Serial.println();
 #endif
 
-    if (func != nullptr)
+    CommunicationHandlerFunctionPtr commandFunc = getCommandFunction(communication.command);
+
+    if (commandFunc != nullptr)
+      commandFunc(timestamp, delta, communication);
+    else if (func != nullptr)
       func(timestamp, delta, communication);
 
     // TODO: read as many sent messages as are in the buffer using the START_BYTE as demarkation
