@@ -20,62 +20,6 @@ Threads::Mutex mutexOutput;
 CommunicationSerial::CommunicationSerial() {
 }
 
-int CommunicationSerial::queue(uint8_t command, uint8_t *byteArray, size_t size) {
-  if (size > BUFFER_MAX_SIZE) {
-    Serial.printf(F("communication-serial-queue: message is too long, max size is %d."), BUFFER_MAX_SIZE);
-    return -1; // exceeded queue length
-  }
-
-#if defined(TEENSYDUINO)
-  Threads::Scope m(mutexOutput); // lock on creation
-#endif
-
-// #ifdef DEBUG
-  Serial.println("communication-serial-queue: trying to queue.");
-  Serial.println("communication-serial-queue: requested bytes: ");
-  for (size_t i = 0; i < size; i++)
-      Serial.printf("%d ", byteArray[i]);
-  Serial.println();
-// #endif
-
-  if (_queueing.size() >= COMMUNICATION_QUEUE_LENGTH) {
-    Serial.println(F("communication-serial-queue: all queues are full."));
-    return -2; // exceeded queue length
-  }
-
-  CommuicationQueueMessageStruct message;
-  memcpy(message.buffer, byteArray, size);
-  message.size = size;
-  message.command = command;
-
-// #ifdef DEBUG
-  Serial.println("communication-serial-queue: message bytes: ");
-  for (size_t i = 0; i < message.size; i++)
-      Serial.printf("%d ", message.buffer[i]);
-  Serial.println();
-// #endif
-
-  _queueing.enqueue(message);
-
-#ifdef DEBUG
-  Serial.println("communication-serial-queue: message queued.");
-#endif
-  return 1;
-}
-
-template <typename T>
-int CommunicationSerial::queuePacked(uint8_t command, const T& val, const uint16_t& size) {
-  // convert packaged struct into byte array
-  uint8_t byteArray[size];
-  uint8_t* ptr = (uint8_t*)&val;
-  for (uint16_t i = index; i < size; i++) {
-    byteArray[i] = *ptr;
-    ptr++;
-  }
-
-  return queue(command, byteArray, size);
-}
-
 int CommunicationSerial::loop(unsigned long timestamp, unsigned long delta) {
 #if defined(TEENSYDUINO)
   Threads::Scope m(mutexOutput); // lock on creation
@@ -136,6 +80,62 @@ int CommunicationSerial::loop(unsigned long timestamp, unsigned long delta) {
     xSemaphoreGive(mutex); // Release the mutex
 }
 #endif
+}
+
+int CommunicationSerial::queue(uint8_t command, uint8_t *byteArray, size_t size) {
+  if (size > BUFFER_MAX_SIZE) {
+    Serial.printf(F("communication-serial-queue: message is too long, max size is %d."), BUFFER_MAX_SIZE);
+    return -1; // exceeded queue length
+  }
+
+#if defined(TEENSYDUINO)
+  Threads::Scope m(mutexOutput); // lock on creation
+#endif
+
+// #ifdef DEBUG
+  Serial.println("communication-serial-queue: trying to queue.");
+  Serial.println("communication-serial-queue: requested bytes: ");
+  for (size_t i = 0; i < size; i++)
+      Serial.printf("%d ", byteArray[i]);
+  Serial.println();
+// #endif
+
+  if (_queueing.size() >= COMMUNICATION_QUEUE_LENGTH) {
+    Serial.println(F("communication-serial-queue: all queues are full."));
+    return -2; // exceeded queue length
+  }
+
+  CommuicationQueueMessageStruct message;
+  memcpy(message.buffer, byteArray, size);
+  message.size = size;
+  message.command = command;
+
+// #ifdef DEBUG
+  Serial.println("communication-serial-queue: message bytes: ");
+  for (size_t i = 0; i < message.size; i++)
+      Serial.printf("%d ", message.buffer[i]);
+  Serial.println();
+// #endif
+
+  _queueing.enqueue(message);
+
+#ifdef DEBUG
+  Serial.println("communication-serial-queue: message queued.");
+#endif
+  return 1;
+}
+
+template <typename T>
+int CommunicationSerial::queuePacked(uint8_t command, const T& val, const uint16_t& size) {
+  // convert packaged struct into byte array
+  uint8_t byteArray[size];
+  uint8_t* ptr = (uint8_t*)&val;
+  for (uint16_t i = index; i < size; i++) {
+    byteArray[i] = *ptr;
+    ptr++;
+  }
+
+  return queue(command, byteArray, size);
 }
 
 size_t CommunicationSerial::read(CommunicationHandlerFunctionPtr func, unsigned long timestamp, unsigned long delta) {
