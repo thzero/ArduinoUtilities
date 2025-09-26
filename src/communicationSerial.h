@@ -53,7 +53,7 @@ class CommunicationSerial {
 
     // CommunicationCommandFunctionEntry *commandsLatest;
     // CommunicationCommandFunctionEntry *commandsHead;
-    std::map<uint16_t, CommunicationCommandFunctionEntry*> _dict;
+    std::map<uint16_t, CommunicationCommandFunctionEntry*> _commands;
     CircularQueue<CommuicationQueueMessageStruct, COMMUNICATION_QUEUE_LENGTH> _queueing;
     SerialTransfer _transfer;
 };

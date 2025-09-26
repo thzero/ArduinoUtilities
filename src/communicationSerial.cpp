@@ -28,12 +28,12 @@ CommunicationCommandFunctionPtr CommunicationSerial::getCommandFunction(uint16_t
 
   // Serial.print("command: ");
   // Serial.println(command);
-  auto results = _dict.find(command);
-  if (results != _dict.end()) {
+  auto results = _commands.find(command);
+  if (results != _commands.end()) {
 #ifdef DEBUG
     Serial.printf("getCommandFunction...found '%d'\n", command);
 #endif
-    CommunicationCommandFunctionEntry *current = _dict.at(command);
+    CommunicationCommandFunctionEntry *current = _commands.at(command);
     if (current != nullptr) {
 #ifdef DEBUG
       Serial.printf("getCommandFunction...did not find '%d'\n", command);
@@ -73,7 +73,7 @@ void CommunicationSerial::initCommand(uint16_t command, CommunicationCommandFunc
   //   commandsLatest->next = item;
   // commandsLatest = item;
 
-  _dict.insert(std::make_pair(command, item));
+  _commands.insert(std::make_pair(command, item));
 }
 
 int CommunicationSerial::loop(unsigned long timestamp, unsigned long delta) {
