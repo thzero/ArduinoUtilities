@@ -5,15 +5,16 @@
 #include <TimeLib.h>
 #endif
 
+#include "communicationConstants.h"
 #include "communicationSerial.h"
 #include <utilities.h>
 #include <utilitiesTime.h>
 
-char* convertTime(unsigned long epochS) {
-    char buff[32];
-    sprintf(buff, "%02d.%02d.%02d %02d:%02d:%02d", month(epochS), day(epochS), year(epochS), hour(epochS), minute(epochS), second(epochS));
-    return buff;
-}
+// char* convertTime(unsigned long epochS) {
+//     char buff[32];
+//     sprintf(buff, "%02d.%02d.%02d %02d:%02d:%02d", month(epochS), day(epochS), year(epochS), hour(epochS), minute(epochS), second(epochS));
+//     return buff;
+// }
 
 void rtcPrintTimeDigits(int digits) {
   // utility function for digital clock display: prints preceding colon and leading 0
@@ -36,11 +37,27 @@ void rtcPrintTime() {
     Serial.println(rtc.getTime("%A, %B %d %Y %H:%M:%S"));
 }
 
-void rtcTimestampCommand(uint8_t commandBuffer[], int commandBufferLength) {
+void rtcTimestampCommand(uint8_t* commandBuffer, uint16_t commandBufferLength) {
 //   Serial.print(F("rtcTimestampCommand... commandBufferLength="));
 //   Serial.println(commandBufferLength);
 
-  size_t size = sizeof(unsigned long) + 1;
+//   size_t size = sizeof(unsigned long) + 1;
+// //   Serial.print(F("rtcTimestampCommand... size="));
+// //   Serial.println(size);
+//   if ((commandBufferLength < size) || (commandBufferLength > size)) {
+//     Serial.printf(F("Invalid timestamp; requires %d character UNIX timestamp."), size);
+//     return;
+//   }
+
+//   unsigned long epoch = convertUnsignedByteArrayToUnsignedLong(&commandBuffer[1]);
+//   Serial.printf(F("rtcTimestampCommand... setting '%d' as the epoch.\n"), epoch);
+//   Serial.println(epoch);
+
+//   rtcSetTime(epoch);
+
+//   Serial.print(F("Current time is: "));
+//   rtcPrintTime();
+  size_t size = sizeof(unsigned long);
 //   Serial.print(F("rtcTimestampCommand... size="));
 //   Serial.println(size);
   if ((commandBufferLength < size) || (commandBufferLength > size)) {
@@ -48,7 +65,7 @@ void rtcTimestampCommand(uint8_t commandBuffer[], int commandBufferLength) {
     return;
   }
 
-  unsigned long epoch = convertUnsignedByteArrayToUnsignedLong(&commandBuffer[1]);
+  unsigned long epoch = convertUnsignedByteArrayToUnsignedLong(&commandBuffer[0]);
   Serial.printf(F("rtcTimestampCommand... setting '%d' as the epoch.\n"), epoch);
   Serial.println(epoch);
 
@@ -84,7 +101,8 @@ void rtcTimestampCommandSend(unsigned long timestamp) {
       Serial.print(buffer[i]);
   Serial.println();
   // Serial2.write(buffer, size);
-  communicationSerialQueue(buffer, size);
+  // communicationSerialQueue(buffer, size);
+  // _communicationSerialObj.queue(buffer, size);
   Serial.println(F("...sent"));
 }
 
@@ -136,25 +154,25 @@ void rtcInit() {
 }
 
 void rtcPrintTime() {
+  Serial.print(month());
+  Serial.print(F("/"));
+  Serial.print(day());
+  Serial.print(F("/"));
+  Serial.print(year()); 
+  Serial.print(F(" "));
   rtcPrintTimeDigits(hour());
   Serial.print(F(":"));
   rtcPrintTimeDigits(minute());
   Serial.print(F(":"));
   rtcPrintTimeDigits(second());
-  Serial.print(F(" "));
-  Serial.print(day());
-  Serial.print(F(" "));
-  Serial.print(month());
-  Serial.print(F(" "));
-  Serial.print(year()); 
   Serial.println(); 
 }
 
-void rtcTimestampCommand(uint8_t commandBuffer[], int commandBufferLength) {
+void rtcTimestampCommand(uint8_t* commandBuffer, uint16_t commandBufferLength) {
   Serial.print(F("rtcTimestampCommand... commandBufferLength="));
   Serial.println(commandBufferLength);
 
-  int size = (int)sizeof(unsigned long) + 1;
+  size_t size = sizeof(unsigned long) + 1;
   Serial.print(F("rtcTimestampCommand... size="));
   Serial.println(size);
   if ((commandBufferLength < size) || (commandBufferLength > size)) {
@@ -162,7 +180,13 @@ void rtcTimestampCommand(uint8_t commandBuffer[], int commandBufferLength) {
     return;
   }
 
-  unsigned long epoch = convertUnsignedByteArrayToUnsignedLong(&commandBuffer[1]);
+  Serial.println("communication-serial-queue: trying to queue.");
+  Serial.println("communication-serial-queue: requested bytes: ");
+  for (size_t i = 0; i < size; i++)
+      Serial.printf("%d ", commandBuffer[i]);
+  Serial.println();
+
+  unsigned long epoch = convertUnsignedByteArrayToUnsignedLong(commandBuffer);
   Serial.print(F("rtcTimestampCommand... epoch="));
   Serial.println(epoch);
 
@@ -173,17 +197,20 @@ void rtcTimestampCommand(uint8_t commandBuffer[], int commandBufferLength) {
 }
 
 void rtcTimestampCommandSend() {
-  size_t size = sizeof(unsigned long) + 2;
+  // size_t size = sizeof(unsigned long) + 2;
+  // uint8_t buffer[size];
+  // memset(buffer, 0, size);
+  // buffer[0] = '$';
+  // buffer[size - 1] = ';';
+  size_t size = sizeof(unsigned long);
   uint8_t buffer[size];
   memset(buffer, 0, size);
-  buffer[0] = '$';
-  buffer[size - 1] = ';';
   unsigned long epoch = rtcGetEpoch();
 
   // Serial.println();
   // Serial.printf(F("Epoch: %ul\n"), epoch);
 
-  convertUnsignedLongToUnsignedByteArray(epoch, &buffer[1]); // pointer to the second byte to start epoch...
+  convertUnsignedLongToUnsignedByteArray(epoch, buffer); // pointer to the second byte to start epoch...
 
   // convertPrintUnsignedByteArrayUnsignedLong(&buffer[1]);
   
@@ -195,11 +222,13 @@ void rtcTimestampCommandSend() {
 // #ifdef DEBUG_SERIAL2
     Serial.print(F("Sent: "));
     for (size_t i = 0; i < size; i++)
-      Serial.printf("%d", buffer[i]);
+      Serial.printf("%d ", buffer[i]);
     Serial.println();
 // #endif
   // Serial2.write(buffer, size);
-  communicationSerialQueue(buffer, size);
+  // communicationSerialQueue(buffer, size);
+  _communicationSerialObj.queue(COMMUNICATION_RTC, buffer, size);
+  // _communicationSerialObj.queue(2, buffer, size);
   Serial.println(F("...sent"));
 }
 
