@@ -39,9 +39,23 @@ class CommunicationSerial {
     CommunicationSerial();
     void initCommand(uint16_t key, CommunicationCommandFunctionPtr func);
     int loop(unsigned long timestamp, unsigned long delta);
-    int queue(uint8_t command, uint8_t *byteArray, size_t size);
+    int queue(uint16_t command, uint8_t *byteArray, size_t size);
+
     template <typename T>
-    int queuePacked(uint8_t command, const T& val, const uint16_t& size = sizeof(T));
+    // int queuePacked(uint16_t command, const T& val, const uint16_t& size = sizeof(T));
+    int queuePacked(uint16_t command, const T& val, const uint16_t& size = sizeof(T)) {
+      // convert packaged struct into byte array
+      uint8_t byteArray[size];
+      // uint8_t* ptr = (uint8_t*)&val;
+      // for (uint16_t i = index; i < size; i++) {
+      //   byteArray[i] = *ptr;
+      //   ptr++;
+      // }
+      memcpy(byteArray, &val, size);
+
+      return queue(command, byteArray, size);
+    }
+
     size_t read(CommunicationHandlerFunctionPtr func, unsigned long timestamp, unsigned long delta);
     bool setup(unsigned long baud, uint32_t config);
 #if !defined(TEENSYDUINO)
