@@ -46,15 +46,21 @@ void deviceCommands::interpretCommandBufferHelp() {
   Serial.println(F("lj;\toutput to serial a list of all flight logs - json"));
 #endif
 
-  if (commandsAdditionalHead != NULL) {
-    DeviceCommandFunctionEntry *current = commandsAdditionalHead;
-    while (current != NULL) {
-        Serial.print(current->tag);
-        Serial.print(F(";\t"));
-        Serial.print(current->description);
-        Serial.println("");
-        current = current->next;
-    }
+  // if (commandsAdditionalHead != nulptr) {
+  //   DeviceCommandFunctionEntry *current = commandsAdditionalHead;
+  //   while (current != NULL) {
+  //       Serial.print(current->tag);
+  //       Serial.print(F(";\t"));
+  //       Serial.print(current->description);
+  //       Serial.println();
+  //       current = current->next;
+  //   }
+  // }
+  for (const auto& pair : _commandsAdditional) {
+    Serial.print(pair.second->tag);
+    Serial.print(F(";\t"));
+    Serial.print(pair.second->description);
+    Serial.println();
   }
 
   Serial.println(F("")); 
@@ -74,24 +80,103 @@ void deviceCommands::interpretCommandBufferI2CScanner() {
 #endif
 
 DeviceCommandFunctionPtr deviceCommands::getCommandAdditionalFunction(char key) {
-  if (commandsAdditionalHead == NULL)
-    return NULL;
+  // if (commandsAdditionalHead == NULL)
+  //   return NULL;
 
   // Serial.print("key: ");
   // Serial.println(key);
-  DeviceCommandFunctionEntry *current = commandsAdditionalHead;
-  while (current != NULL) {
-    // Serial.print("key.current: ");
-    // Serial.println(current->key);
-      if (current->key != key) {
-        current = current->next;
-        continue;
-      }
-
+  auto results = _commandsAdditional.find(key);
+  if (results != _commandsAdditional.end()) {
+#ifdef DEBUG
+    Serial.printf("getCommandAdditionalFunction...found '%c'\n", key);
+#endif
+    DeviceCommandFunctionEntry *current = _commandsAdditional.at(key);
+    if (current != nullptr) {
+#ifdef DEBUG
+      Serial.printf("getCommandAdditionalFunction...did not find '%c'\n", key);
+#endif
       return current->func;
+    }
   }
+#ifdef DEBUG
+  else
+    Serial.println("getCommandAdditionalFunction...did not find it...");
+#endif
+
+  // DeviceCommandFunctionEntry *current = commandsAdditionalHead;
+  // while (current != NULL) {
+  //   // Serial.print("key.current: ");
+  //   // Serial.println(current->key);
+  //     if (current->key != key) {
+  //       current = current->next;
+  //       continue;
+  //     }
+
+  //     return current->func;
+  // }
 
   return NULL; // Key not found
+}
+
+void deviceCommands::initCommand(char key, DeviceCommandFunctionPtr func, bool visible, const char *tag, const char *description) {
+  DeviceCommandFunctionEntry *item = (DeviceCommandFunctionEntry *)malloc(sizeof(DeviceCommandFunctionEntry));
+  item->key = key;
+  item->func = func;
+  item->visible = visible;
+  strcpy(item->tag, tag);
+  strcpy(item->description, description);
+  item->next = NULL;
+
+  // if (commandsAdditionalHead == NULL)
+  //   commandsAdditionalHead = item;
+  // if (commandsAdditionalLatest != NULL)
+  //   commandsAdditionalLatest->next = item;
+  // commandsAdditionalLatest = item;
+
+  _commandsAdditional.insert(std::make_pair(key, item));
+}
+
+void deviceCommands::interpretBuffer() {
+// #if defined(DWBUG) && defined(DEBUG_COMMAND)
+//   Serial.print(F("interpretCommandBuffer.commandBuffer="));
+//   for (int i = 0; i < commandBufferLength; i++) {
+//   Serial.print(commandBuffer[i]);
+//   // Serial.printf("%c", commandBuffer[i]);
+//   // Serial.printf("%d", commandBuffer[i]);
+//   }
+//   Serial.println(F(""));
+// #endif
+
+  interpretCommandBuffer();
+  resetCommandBuffer();
+}
+
+void deviceCommands::interpretBuffer(uint8_t *commandBufferI, int length) {
+// #if defined(DWBUG) && defined(DEBUG_COMMAND)
+  // Serial.print(F("interpretBuffer.length="));
+  // Serial.println(length);
+// #endif
+  commandBufferLength = length;
+
+// #if defined(DWBUG) && defined(DEBUG_COMMAND)
+  // Serial.print(F("interpretBuffer.commandBufferI="));
+  // for (int i = 0; i < length; i++) {
+  //   Serial.printf("%d", commandBufferI[i]);
+  // }
+  // Serial.println();
+// #endif
+  memcpy(commandBuffer, commandBufferI, length);
+  
+// #if defined(DWBUG) && defined(DEBUG_COMMAND)
+  // Serial.print(F("interpretBuffer.commandBuffer="));
+  // for (int i = 0; i < length; i++) {
+  //   Serial.printf("%d", commandBufferI[i]);
+  // }
+  // Serial.println();
+// #endif
+
+  interpretCommandBuffer();
+  resetCommandBuffer();
 }
 
 //  Available commands.
@@ -159,70 +244,6 @@ void deviceCommands::interpretCommandBuffer() {
   Serial.println();
 }
 
-void deviceCommands::resetCommandBuffer() {
-  memset(commandBuffer, 0, sizeof(commandBuffer));
-  commandBufferLength = 0;
-}
-
-void deviceCommands::initCommand(char key, DeviceCommandFunctionPtr func, bool visible, const char *tag, const char *description) {
-  DeviceCommandFunctionEntry *item = (DeviceCommandFunctionEntry *)malloc(sizeof(DeviceCommandFunctionEntry));
-  item->key = key;
-  item->func = func;
-  item->visible = visible;
-  strcpy(item->tag, tag);
-  strcpy(item->description, description);
-  item->next = NULL;
-
-  if (commandsAdditionalHead == NULL)
-    commandsAdditionalHead = item;
-  if (commandsAdditionalLatest != NULL)
-    commandsAdditionalLatest->next = item;
-  commandsAdditionalLatest = item;
-}
-
-void deviceCommands::interpretBuffer() {
-// #if defined(DWBUG) && defined(DEBUG_COMMAND)
-//   Serial.print(F("interpretCommandBuffer.commandBuffer="));
-//   for (int i = 0; i < commandBufferLength; i++) {
-//   Serial.print(commandBuffer[i]);
-//   // Serial.printf("%c", commandBuffer[i]);
-//   // Serial.printf("%d", commandBuffer[i]);
-//   }
-//   Serial.println(F(""));
-// #endif
-
-  interpretCommandBuffer();
-  resetCommandBuffer();
-}
-
-void deviceCommands::interpretBuffer(uint8_t *commandBufferI, int length) {
-// #if defined(DWBUG) && defined(DEBUG_COMMAND)
-  // Serial.print(F("interpretBuffer.length="));
-  // Serial.println(length);
-// #endif
-  commandBufferLength = length;
-
-// #if defined(DWBUG) && defined(DEBUG_COMMAND)
-  // Serial.print(F("interpretBuffer.commandBufferI="));
-  // for (int i = 0; i < length; i++) {
-  //   Serial.printf("%d", commandBufferI[i]);
-  // }
-  // Serial.println();
-// #endif
-  memcpy(commandBuffer, commandBufferI, length);
-  
-// #if defined(DWBUG) && defined(DEBUG_COMMAND)
-  // Serial.print(F("interpretBuffer.commandBuffer="));
-  // for (int i = 0; i < length; i++) {
-  //   Serial.printf("%d", commandBufferI[i]);
-  // }
-  // Serial.println();
-// #endif
-
-  interpretCommandBuffer();
-  resetCommandBuffer();
-}
-
 bool deviceCommands::readSerial(unsigned long timestamp, unsigned long delta) {
   uint8_t readVal = ' ';
 
@@ -282,6 +303,11 @@ bool deviceCommands::readSerialInterpret(unsigned long timestamp, unsigned long 
     }
 
     return false;
+}
+
+void deviceCommands::resetCommandBuffer() {
+  memset(commandBuffer, 0, sizeof(commandBuffer));
+  commandBufferLength = 0;
 }
 
 deviceCommands _deviceCommands;

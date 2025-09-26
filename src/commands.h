@@ -2,6 +2,7 @@
 #define _COMMANDS_H
 
 #include <Arduino.h>
+#include <map>
 
 typedef void (*DeviceCommandFunctionPtr)(uint8_t* commandBuffer, uint16_t commandBufferLength);
 
@@ -29,8 +30,9 @@ class deviceCommands {
     int versionMinor;
     uint8_t commandBuffer[256];
     int commandBufferLength = 0;
-    DeviceCommandFunctionEntry *commandsAdditionalLatest;
-    DeviceCommandFunctionEntry *commandsAdditionalHead;
+    // DeviceCommandFunctionEntry *commandsAdditionalLatest;
+    // DeviceCommandFunctionEntry *commandsAdditionalHead;
+    std::map<char, DeviceCommandFunctionEntry*> _commandsAdditional;
 
     void interpretCommandBufferHelp();
 #ifdef DEV
