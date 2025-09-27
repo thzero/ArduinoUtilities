@@ -34,7 +34,7 @@ void rtcInit() {
 }
 
 void rtcPrintTime() {
-    Serial.println(rtc.getTime("%A, %B %d %Y %H:%M:%S"));
+    // Serial.println(rtc.getTime("%A, %B %d %Y %H:%M:%S"));
 }
 
 void rtcTimestampCommand(uint8_t* commandBuffer, uint16_t commandBufferLength) {
