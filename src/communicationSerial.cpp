@@ -102,7 +102,7 @@ int CommunicationSerial::loop(unsigned long timestamp, unsigned long delta) {
   _queueing.dequeue();
 
 #ifdef DEBUG
-  Serial.print("communication-serial-loop: message command size to send: ");
+  Serial.print("communication-serial-loop: message command to send: ");
   Serial.printf("%d\n", message.command);
   Serial.print("communication-serial-loop: message bytes size to send: ");
   Serial.printf("%d\n", message.size);
@@ -146,13 +146,14 @@ int CommunicationSerial::queue(uint16_t command, uint8_t *byteArray, size_t size
   Threads::Scope m(mutexOutput); // lock on creation
 #endif
 
-// #ifdef DEBUG
-  Serial.println("communication-serial-queue: trying to queue.");
+#ifdef DEBUG
+  Serial.print("communication-serial-queue: message command: ");
+  Serial.printf("%d\n", command);
   Serial.println("communication-serial-queue: requested bytes: ");
   for (size_t i = 0; i < size; i++)
       Serial.printf("%d ", byteArray[i]);
   Serial.println();
-// #endif
+#endif
 
   if (_queueing.size() >= COMMUNICATION_QUEUE_LENGTH) {
     Serial.println(F("communication-serial-queue: all queues are full."));
@@ -164,12 +165,16 @@ int CommunicationSerial::queue(uint16_t command, uint8_t *byteArray, size_t size
   message.size = size;
   message.command = command;
 
-// #ifdef DEBUG
+#ifdef DEBUG
+  Serial.print("communication-serial-queue: message command to send: ");
+  Serial.printf("%d\n", message.command);
+  Serial.print("communication-serial-queue: message size to send: ");
+  Serial.printf("%d\n", message.size);
   Serial.println("communication-serial-queue: message bytes: ");
   for (size_t i = 0; i < message.size; i++)
       Serial.printf("%d ", message.buffer[i]);
   Serial.println();
-// #endif
+#endif
 
   _queueing.enqueue(message);
 

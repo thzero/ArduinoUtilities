@@ -15,7 +15,7 @@ const uint8_t MESSAGE_START_BYTE = 0x7E;
 const uint8_t MESSAGE_STOP_BYTE  = 0x81;
 
 struct CommuicationQueueMessageStruct {
-  uint8_t command;
+  uint16_t command;
   size_t size;
   uint8_t buffer[BUFFER_MAX_SIZE];
   uint8_t crc;
