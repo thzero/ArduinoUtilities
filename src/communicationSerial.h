@@ -30,10 +30,6 @@ struct CommunicationCommandFunctionEntry {
     struct CommunicationCommandFunctionEntry *next;
 };
 
-extern int communicationSerialQueue(uint8_t *byteArray, size_t size);
-extern int communicationSerialLoop(unsigned long delta);
-extern bool communicationSerialSetup();
-
 class CommunicationSerial {
   public:
     CommunicationSerial();
