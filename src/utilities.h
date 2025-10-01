@@ -19,6 +19,10 @@ extern void feedWatchdog();
 
 extern unsigned int msgChk(char * buffer, long length);
 
+void printFloat(float val, bool valid, int len, int prec);
+void printInt(unsigned long val, bool valid, int len);
+void printStr(const char *str, int len);
+
 extern float round2dec(float var);
 extern long roundUp(float val);
 
