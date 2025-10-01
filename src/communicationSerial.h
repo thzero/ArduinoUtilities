@@ -17,7 +17,7 @@ const uint8_t MESSAGE_STOP_BYTE  = 0x81;
 struct CommuicationQueueMessageStruct {
   uint16_t command;
   size_t size;
-  uint8_t buffer[BUFFER_MAX_SIZE];
+  uint8_t buffer[BUFFER_MAX_MESSAGE_SIZE];
   uint8_t crc;
 };
 
@@ -35,6 +35,7 @@ class CommunicationSerial {
     CommunicationSerial();
     void initCommand(uint16_t key, CommunicationCommandFunctionPtr func);
     int loop(unsigned long timestamp, unsigned long delta);
+    int queue(uint16_t command);
     int queue(uint16_t command, uint8_t *byteArray, size_t size);
 
     template <typename T>
