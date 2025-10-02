@@ -1,4 +1,5 @@
 #include <Arduino.h>
+#include <limits.h>  //for LONG_MIN
 
 #include "utilities.h"
 
@@ -133,6 +134,8 @@ void printFloat(float val, bool valid, int len, int prec) {
 
 void printInt(unsigned long val, bool valid, int len) {
   char sz[32] = "*****************";
+  if (val == LONG_MIN)
+    valid = false;
   if (valid)
     sprintf(sz, "%ld", val);
   sz[len] = 0;
