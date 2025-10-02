@@ -7,9 +7,10 @@
 #include <CircularQueue.hpp>
 #include <map>
 
-#define COMMUNICATION_QUEUE_LENGTH 5
 #define BUFFER_MAX_SIZE 1024
 #define BUFFER_MAX_MESSAGE_SIZE 1021 // start - command - size - size - bytes - crc - end
+#define COMMUNICATION_QUEUE_LENGTH 5
+// #define DEBUG_COMMUNICATION
 
 const uint8_t MESSAGE_START_BYTE = 0x7E;
 const uint8_t MESSAGE_STOP_BYTE  = 0x81;

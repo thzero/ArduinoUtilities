@@ -9,8 +9,6 @@
 #include "communicationSerial.h"
 #include <utilities.h>
 
-// #define DEBUG
-
 #if defined(ESP32)
 SemaphoreHandle_t mutex;
 // std::mutex serial_mtx;
@@ -26,7 +24,7 @@ CommunicationCommandFunctionPtr CommunicationSerial::getCommandFunction(uint16_t
   // if (commandsHead == NULL)
   //   return NULL;
 
-#ifdef DEBUG
+#ifdef DEBUG_COMMUNICATION
   Serial.print("getCommandFunction.command: ");
   Serial.println(command);
   // for (const auto& pair : _commands) {
@@ -37,18 +35,18 @@ CommunicationCommandFunctionPtr CommunicationSerial::getCommandFunction(uint16_t
 
   auto results = _commands.find(command);
   if (results != _commands.end()) {
-#ifdef DEBUG
+#ifdef DEBUG_COMMUNICATION
     Serial.printf("getCommandFunction...found '%d'\n", command);
 #endif
     CommunicationCommandFunctionEntry *current = _commands.at(command);
     if (current != nullptr) {
-#ifdef DEBUG
+#ifdef DEBUG_COMMUNICATION
       Serial.printf("getCommandFunction...found '%d'\n", command);
 #endif
       return current->func;
     }
   }
-#ifdef DEBUG
+#ifdef DEBUG_COMMUNICATION
   else
     Serial.printf("getCommandFunction...did not find  '%d'\n", command);
 #endif
@@ -109,7 +107,7 @@ int CommunicationSerial::loop(unsigned long timestamp, unsigned long delta) {
   CommuicationQueueMessageStruct message = _queueing.front();
   _queueing.dequeue();
 
-#ifdef DEBUG
+#ifdef DEBUG_COMMUNICATION
   Serial.print("communication-serial-loop: message command to send: ");
   Serial.printf("%d\n", message.command);
   Serial.print("communication-serial-loop: message bytes size to send: ");
@@ -135,7 +133,7 @@ int CommunicationSerial::loop(unsigned long timestamp, unsigned long delta) {
 
   memset(message.buffer, 0, BUFFER_MAX_SIZE);
 
-#ifdef DEBUG
+#ifdef DEBUG_COMMUNICATION
   Serial.println("communication-serial-loop: sent buffer.");
 #endif
 
@@ -151,7 +149,7 @@ int CommunicationSerial::loop(unsigned long timestamp, unsigned long delta) {
 }
 
 int CommunicationSerial::queue(uint16_t command) {
-#ifdef DEBUG
+#ifdef DEBUG_COMMUNICATION
   Serial.print("communication-serial-queue: message command: ");
   Serial.printf("%d\n", command);
 #endif
@@ -184,7 +182,7 @@ int CommunicationSerial::queue(uint16_t command) {
   message.size = 1;
   message.command = command;
 
-#ifdef DEBUG
+#ifdef DEBUG_COMMUNICATION
   Serial.print("communication-serial-queue: message command to send: ");
   Serial.printf("%d\n", message.command);
   Serial.print("communication-serial-queue: message size to send: ");
@@ -197,7 +195,7 @@ int CommunicationSerial::queue(uint16_t command) {
 
   _queueing.enqueue(message);
 
-#ifdef DEBUG
+#ifdef DEBUG_COMMUNICATION
   Serial.println("communication-serial-queue: message queued.");
 #endif
 
@@ -218,7 +216,7 @@ int CommunicationSerial::queue(uint16_t command, uint8_t *byteArray, size_t size
     return -1; // exceeded queue length
   }
 
-#ifdef DEBUG
+#ifdef DEBUG_COMMUNICATION
   Serial.print("communication-serial-queue: message command: ");
   Serial.printf("%d\n", command);
   Serial.println("communication-serial-queue: requested bytes: ");
@@ -232,7 +230,7 @@ int CommunicationSerial::queue(uint16_t command, uint8_t *byteArray, size_t size
   message.size = size;
   message.command = command;
 
-#ifdef DEBUG
+#ifdef DEBUG_COMMUNICATION
   Serial.print("communication-serial-queue: message command to send: ");
   Serial.printf("%d\n", message.command);
   Serial.print("communication-serial-queue: message size to send: ");
@@ -266,7 +264,7 @@ int CommunicationSerial::queue(uint16_t command, uint8_t *byteArray, size_t size
 
   _queueing.enqueue(message);
 
-#ifdef DEBUG
+#ifdef DEBUG_COMMUNICATION
   Serial.println("communication-serial-queue: message queued.");
 #endif
 
@@ -288,31 +286,31 @@ size_t CommunicationSerial::read(CommunicationHandlerFunctionPtr func, unsigned 
     // uint8_t buffer[BUFFER_MAX_SIZE];
     // size_t size;
     communication.command = _transfer.currentCommand();
-// #ifdef DEBUG
+#ifdef DEBUG_COMMUNICATION
     Serial.print("communication-serial-loop: message command received: ");
     Serial.printf("%d %d %d\n", communication.command, _transfer.currentCommand(), (communication.command == _transfer.currentCommand()));
-// #endif
+#endif
     communication.size = _transfer.currentReceived();
-// #ifdef DEBUG
+#ifdef DEBUG_COMMUNICATION
     Serial.print("communication-serial-loop: message bytes to receive: ");
     Serial.printf("%d\n", communication.size);
-// #endif
+#endif
 //     uint16_t recSize = 0;  // bytes we've processed from the receive buffer
 //     recSize = _transfer.rxObj(communication.size, sizeof(size_t));
-// #ifdef DEBUG
-//     Serial.print("communication-serial-loop: message bytes to receive: ");
-//     Serial.printf("%d\n", communication.size);
-// #endif
+#ifdef DEBUG_COMMUNICATION
+    Serial.print("communication-serial-loop: message bytes to receive: ");
+    Serial.printf("%d\n", communication.size);
+#endif
     // recSize = _transfer.rxObj(communication.buffer, recSize, communication.size);
     uint16_t recSize = _transfer.rxObj(communication.buffer, 0, communication.size);
-// #ifdef DEBUG
+#ifdef DEBUG_COMMUNICATION
     Serial.print("communication-serial-loop: message bytes to received: ");
     Serial.printf("%d\n", recSize);
     Serial.print("communication-serial-loop: message bytes received: ");
     for (size_t i = 0; i < communication.size; i++)
         Serial.printf("%d ", communication.buffer[i]);
     Serial.println();
-// #endif
+#endif
 
     CommunicationHandlerFunctionPtr commandFunc = getCommandFunction(communication.command);
 
@@ -332,13 +330,13 @@ size_t CommunicationSerial::read(CommunicationHandlerFunctionPtr func, unsigned 
 
 //     communication.size = Serial2.readBytesUntil(';', communication.buffer, BUFFER_MAX_SIZE - 1);
     
-// #ifdef DEBUG
+// #ifdef DEBUG_COMMUNICATION
 //     Serial.println("communication-serial-read: message size received: ");
 //     Serial.printf("%d\n", communication.size);
 // #endif
 //     // recSize = _transfer.rxObj(communication.buffer, recSize, communication.size);
 
-// #ifdef DEBUG
+// #ifdef DEBUG_COMMUNICATION
 //     Serial.println("communication-serial-read: message bytes to receive: ");
 //     for (int i = 0; i < communication.size; i++)
 //       Serial.printf("%d ", communication.buffer[i]);
@@ -369,7 +367,7 @@ Serial1.addMemoryForRead(&bigserialbuffer, sizeof(bigserialbuffer));
   Serial.println("\t...enabled Serial2.");
 
   Serial.println("\tEable transfer on Serial2.");
-#ifdef DEBUG
+#ifdef DEBUG_COMMUNICATION
   uint8_t debug = 2;
 #else
   uint8_t debug = 0;
@@ -400,7 +398,7 @@ bool CommunicationSerial::setup(unsigned long baud, uint32_t config, int8_t rxPi
   Serial.println("\t...enabled Serial2.");
 
   Serial.println("\tEable transfer on Serial2.");
-#ifdef DEBUG
+#ifdef DEBUG_COMMUNICATION
   uint8_t debug = 2;
 #else
   uint8_t debug = 0;
