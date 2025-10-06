@@ -1,6 +1,7 @@
 #if defined(TEENSYDUINO)
 
 #include <string.h>
+#include <malloc.h> // Provides malloc_stats()
 
 #include <utilities.h>
 #include "monitorHardwareTeensy.h"
@@ -46,6 +47,13 @@ byte monitorHardwareTeensy::monitorMemory() {
 
   char* sp = (char*)__builtin_frame_address(0);
 
+  /*
+  https://forum.pjrc.com/index.php?threads/how-to-display-free-ram.33443/
+  One way Teensy 4.x differs from earlier Teensy and many other microcontrollers is the local variables are in a physically 
+  different memory than the heap for malloc(). A more common arrangement is the heap starts right after the zeroed variable 
+  and grows upward in the same memory as the local variables which start at the top and grown downward.
+  */
+
   // Serial.printf("_stext        %08x\n",      _stext);
   // Serial.printf("_etext        %08x +%db\n", _etext, _etext-_stext);
   // Serial.printf("_sdata        %08x\n",      _sdata);
@@ -84,9 +92,6 @@ byte monitorHardwareTeensy::monitorMemory() {
   _memoryHeap = heap;
   _memoryRam = psram;
   _memoryStack = stack;
-  _memoryHeapKb = heap>>10;
-  _memoryRamKb = psram>>10;
-  _memoryStackKb = stack>>10;
 
   return 0;
 }
