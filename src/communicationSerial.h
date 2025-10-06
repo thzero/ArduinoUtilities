@@ -35,7 +35,7 @@ class CommunicationSerial {
   public:
     CommunicationSerial();
     void initCommand(uint16_t key, CommunicationCommandFunctionPtr func);
-    int loop(unsigned long timestamp, unsigned long delta);
+    int process(unsigned long timestamp, unsigned long delta);
     int queue(uint16_t command);
     int queue(uint16_t command, uint8_t *byteArray, size_t size);
 

@@ -81,7 +81,7 @@ void CommunicationSerial::initCommand(uint16_t command, CommunicationCommandFunc
   _commands.insert(std::make_pair(command, item));
 }
 
-int CommunicationSerial::loop(unsigned long timestamp, unsigned long delta) {
+int CommunicationSerial::process(unsigned long timestamp, unsigned long delta) {
 #if defined(TEENSYDUINO)
   // Threads::Scope m(mutexOutput); // lock on creation
   mutexOutput.lock();
@@ -91,7 +91,7 @@ int CommunicationSerial::loop(unsigned long timestamp, unsigned long delta) {
 #endif
 
   if (_queueing.isEmpty()) {
-    // Serial.println("communication-serial-loop: nothing to send.");
+    // Serial.println("communication-serial-process: nothing to send.");
 #if defined(TEENSYDUINO)
     mutexOutput.unlock();
 #endif
@@ -108,12 +108,12 @@ int CommunicationSerial::loop(unsigned long timestamp, unsigned long delta) {
   _queueing.dequeue();
 
 #ifdef DEBUG_COMMUNICATION
-  Serial.print("communication-serial-loop: message command to send: ");
+  Serial.print("communication-serial-process: message command to send: ");
   Serial.printf("%d\n", message.command);
-  Serial.print("communication-serial-loop: message bytes size to send: ");
+  Serial.print("communication-serial-process: message bytes size to send: ");
   Serial.printf("%d\n", message.size);
 
-  Serial.println("communication-serial-loop: message bytes to send: ");
+  Serial.println("communication-serial-process: message bytes to send: ");
   for (size_t i = 0; i < message.size; i++)
       Serial.printf("%d ", message.buffer[i]);
   Serial.println();
@@ -126,7 +126,7 @@ int CommunicationSerial::loop(unsigned long timestamp, unsigned long delta) {
 //   // sendSize = _transfer.txObj(message.size, sendSize);
 //   // sendSize = _transfer.txObj(message.buffer, 0, message.size); // Stuff buffer with arra
   uint16_t sendSize = _transfer.txObj(message.buffer, 0, message.size); // Stuff buffer with array
-  // Serial.print("communication-serial-loop: message bytes sent: ");
+  // Serial.print("communication-serial-process: message bytes sent: ");
   // Serial.printf("%d\n", sendSize);
 
   _transfer.sendData(sendSize, message.command);
@@ -134,7 +134,7 @@ int CommunicationSerial::loop(unsigned long timestamp, unsigned long delta) {
   memset(message.buffer, 0, BUFFER_MAX_SIZE);
 
 #ifdef DEBUG_COMMUNICATION
-  Serial.println("communication-serial-loop: sent buffer.");
+  Serial.println("communication-serial-process: sent buffer.");
 #endif
 
 #if defined(ESP32)
@@ -287,26 +287,26 @@ size_t CommunicationSerial::read(CommunicationHandlerFunctionPtr func, unsigned 
     // size_t size;
     communication.command = _transfer.currentCommand();
 #ifdef DEBUG_COMMUNICATION
-    Serial.print("communication-serial-loop: message command received: ");
+    Serial.print("communication-serial-read: message command received: ");
     Serial.printf("%d %d %d\n", communication.command, _transfer.currentCommand(), (communication.command == _transfer.currentCommand()));
 #endif
     communication.size = _transfer.currentReceived();
 #ifdef DEBUG_COMMUNICATION
-    Serial.print("communication-serial-loop: message bytes to receive: ");
+    Serial.print("communication-serial-read: message bytes to receive: ");
     Serial.printf("%d\n", communication.size);
 #endif
 //     uint16_t recSize = 0;  // bytes we've processed from the receive buffer
 //     recSize = _transfer.rxObj(communication.size, sizeof(size_t));
 #ifdef DEBUG_COMMUNICATION
-    Serial.print("communication-serial-loop: message bytes to receive: ");
+    Serial.print("communication-serial-read: message bytes to receive: ");
     Serial.printf("%d\n", communication.size);
 #endif
     // recSize = _transfer.rxObj(communication.buffer, recSize, communication.size);
     uint16_t recSize = _transfer.rxObj(communication.buffer, 0, communication.size);
 #ifdef DEBUG_COMMUNICATION
-    Serial.print("communication-serial-loop: message bytes to received: ");
+    Serial.print("communication-serial-read: message bytes to received: ");
     Serial.printf("%d\n", recSize);
-    Serial.print("communication-serial-loop: message bytes received: ");
+    Serial.print("communication-serial-read: message bytes received: ");
     for (size_t i = 0; i < communication.size; i++)
         Serial.printf("%d ", communication.buffer[i]);
     Serial.println();
