@@ -1,4 +1,5 @@
 #include <Arduino.h>
+#include <limits.h>  //for LONG_MIN
 
 #include "utilities.h"
 
@@ -113,6 +114,42 @@ unsigned int msgChk(char * buffer, long length) {
 
   for (index = 0L, checksum = 0; index < length; checksum += (unsigned int) buffer[index++]);
   return (unsigned int) (checksum % 256);
+}
+
+void printFloat(float val, bool valid, int len, int prec) {
+  if (!valid) {
+    while (len-- > 1)
+      Serial.print('*');
+    Serial.print(' ');
+    return;
+  }
+
+  Serial.print(val, prec);
+  int vi = abs((int)val);
+  int flen = prec + (val < 0.0 ? 2 : 1); // . and -
+  flen += vi >= 1000 ? 4 : vi >= 100 ? 3 : vi >= 10 ? 2 : 1;
+  for (int i = flen; i < len; ++i)
+    Serial.print(' ');
+}
+
+void printInt(unsigned long val, bool valid, int len) {
+  char sz[32] = "*****************";
+  if (val == LONG_MIN)
+    valid = false;
+  if (valid)
+    sprintf(sz, "%ld", val);
+  sz[len] = 0;
+  for (int i = strlen(sz); i < len; ++i)
+    sz[i] = ' ';
+  if (len > 0) 
+    sz[len-1] = ' ';
+  Serial.print(sz);
+}
+
+void printStr(const char *str, int len) {
+  int slen = strlen(str);
+  for (int i = 0; i < len; ++i)
+    Serial.print(i < slen ? str[i] : ' ');
 }
 
 float round2dec(float var) {

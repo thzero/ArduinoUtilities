@@ -34,7 +34,7 @@ void rtcInit() {
 }
 
 void rtcPrintTime() {
-    // Serial.println(rtc.getTime("%A, %B %d %Y %H:%M:%S"));
+    Serial.println(rtc.getTime("%A, %B %d %Y %H:%M:%S"));
 }
 
 void rtcTimestampCommand(uint8_t* commandBuffer, uint16_t commandBufferLength) {
@@ -130,6 +130,8 @@ time_t getTeensy3Time() {
 }
 
 void rtcInit() {
+  Serial.println(F("Syncing RTC time..."));
+
   setSyncProvider(getTeensy3Time);   // the function to get the time from the RTC
   bool failed = false;
   if (timeStatus() == timeNotSet) {
@@ -144,13 +146,15 @@ void rtcInit() {
     Serial.println(F("Unable to sync with the RTC; time was not set."));
     failed = true;
   }
-  else
-    Serial.println(F("RTC has set the system time"));
 
-  if (failed) {
+  if (failed)
     setTime(1735689600);
-  }
+
+  Serial.print(F("\tRTC has set the system time: "));
   rtcPrintTime();
+
+  Serial.println(F("...synched RTC time."));
+  Serial.println();
 }
 
 void rtcPrintTime() {
@@ -219,12 +223,12 @@ void rtcTimestampCommandSend() {
   // Serial.printf(F("Epoch == Epoch2: %ul=%ul %d\n"), epoch, epoch2, epoch == epoch2);
 
   Serial.printf(F("Sending epoch '%d' as bytes...\n"), epoch);
-// #ifdef DEBUG_SERIAL2
+#ifdef DEBUG_RTC
     Serial.print(F("Sent: "));
     for (size_t i = 0; i < size; i++)
       Serial.printf("%d ", buffer[i]);
     Serial.println();
-// #endif
+#endif
   // Serial2.write(buffer, size);
   // communicationSerialQueue(buffer, size);
   _communicationSerialObj.queue(COMMUNICATION_RTC, buffer, size);
