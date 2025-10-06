@@ -6,6 +6,7 @@
 #include <TeensyThreads.h>
 #endif
 
+#include "communicationConstants.h"
 #include "communicationSerial.h"
 #include <utilities.h>
 
@@ -82,6 +83,15 @@ void CommunicationSerial::initCommand(uint16_t command, CommunicationCommandFunc
 }
 
 int CommunicationSerial::process(unsigned long timestamp, unsigned long delta) {
+  if (_health == 1) {
+    uint16_t now = millis();
+    uint16_t delta = now - _healthMs;
+    if (delta > 5000) {
+      _health = 0;
+      _healthMs = 0;
+    }
+  }
+
 #if defined(TEENSYDUINO)
   // Threads::Scope m(mutexOutput); // lock on creation
   mutexOutput.lock();
@@ -147,6 +157,11 @@ int CommunicationSerial::process(unsigned long timestamp, unsigned long delta) {
 }
 
 int CommunicationSerial::queue(uint16_t command) {
+  if (!_health) {
+    Serial.printf(F("communication-serial-queue: health is %d.\n"), _health);
+    return 0;
+  }
+
 #ifdef DEBUG_COMMUNICATION
   Serial.printf(F("communication-serial-queue: message command: "));
   Serial.printf(F("%d\n"), command);
@@ -207,6 +222,11 @@ int CommunicationSerial::queue(uint16_t command) {
 }
 
 int CommunicationSerial::queue(uint16_t command, uint8_t *byteArray, size_t size) {
+  if (!_health) {
+    Serial.printf(F("communication-serial-queue: health is %d.\n"), _health);
+    return 0;
+  }
+
   if (size > BUFFER_MAX_MESSAGE_SIZE) {
     Serial.printf(F("communication-serial-queue: message is too long, max size is %d."), BUFFER_MAX_SIZE);
     return -1; // exceeded queue length
@@ -301,6 +321,19 @@ size_t CommunicationSerial::read(CommunicationHandlerFunctionPtr func, unsigned 
     Serial.println();
 #endif
 
+    if (communication.command == COMMAND_COMMUNICATION_HEALTH) {
+#ifdef DEBUG_COMMUNICATION
+      Serial.println(F("communication-serial-read: received health request..."));
+#endif
+      _health = true;
+      _healthMs = millis();
+      return 0;
+    }
+
+    // if health checks haven't occured, then no other processing...
+    if (!_health)
+      return 0;
+
     CommunicationHandlerFunctionPtr commandFunc = getCommandFunction(communication.command);
 
     if (commandFunc != nullptr)
@@ -337,6 +370,35 @@ size_t CommunicationSerial::read(CommunicationHandlerFunctionPtr func, unsigned 
   //   return communication.size;
   // }
   return 0;
+}
+
+int CommunicationSerial::send(uint16_t command) {
+#ifdef DEBUG_COMMUNICATION
+  Serial.printf(F("communication-serial-send: message command: "));
+  Serial.printf(F("%d\n"), command);
+#endif
+
+  CommuicationQueueMessageStruct message;
+  uint8_t byteArray[1];
+  byteArray[1] = 0;
+  memcpy(message.buffer, byteArray, 1);
+  message.size = 1;
+  message.command = command;
+
+#ifdef DEBUG_COMMUNICATION
+  Serial.printf(F("communication-serial-send: message command to send: %d\n"), message.command);
+  Serial.printf(F("communication-serial-send: message size to send: %d\n"), message.size);
+  Serial.println(F("communication-serial-send: message bytes: "));
+  for (size_t i = 0; i < message.size; i++)
+      Serial.printf(F("%d "), message.buffer[i]);
+  Serial.println();
+  Serial.println(F("communication-serial-send: send"));
+#endif
+  
+  uint16_t sendSize = _transfer.txObj(message.buffer, 0, message.size);
+  _transfer.sendData(sendSize, message.command);
+
+  return 1;
 }
 
 bool CommunicationSerial::setup(unsigned long baud, uint32_t config) {
@@ -405,5 +467,9 @@ bool CommunicationSerial::setup(unsigned long baud, uint32_t config, int8_t rxPi
   return true;
 }
 #endif
+
+bool CommunicationSerial::healthy() {
+  return _health;
+}
 
 CommunicationSerial _communicationSerialObj;
