@@ -8,7 +8,7 @@ extern unsigned long rtcGetEpoch();
 extern void rtcInit();
 extern void rtcPrintTime();
 extern void rtcPrintTimeDigits(int digits);
-extern void rtcTimestampCommand(uint8_t commandBuffer[], int commandBufferLength);
+extern void rtcTimestampCommand(uint8_t* commandBuffer, uint16_t commandBufferLength);
 extern void rtcTimestampCommandSend();
 extern void rtcTimestampCommandSend(unsigned long timestamp);
 extern void rtcSetTime(unsigned long time);

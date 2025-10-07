@@ -30,15 +30,10 @@ class monitorHardwareBase {
     float _cpuTemp = 0.0;
     float _cpuTempMax = 0.0;
     int _memoryHeap = 0;
-    int _memoryHeapKb = 0;
     int _memoryHeapInternal = 0;
-    int _memoryHeapInternalKb = 0;
     int _memoryHeapMinimum = 0;
-    int _memoryHeapMinimumKb = 0;
     int _memoryRam = 0;
-    int _memoryRamKb = 0;
     int _memoryStack = 0;
-    int _memoryStackKb = 0;
     float _voltage = 0;
     uint8_t _voltagePin = 0;
 

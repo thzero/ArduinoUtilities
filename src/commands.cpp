@@ -46,15 +46,21 @@ void deviceCommands::interpretCommandBufferHelp() {
   Serial.println(F("lj;\toutput to serial a list of all flight logs - json"));
 #endif
 
-  if (commandsAdditionalHead != NULL) {
-    DeviceCommandFunctionEntry *current = commandsAdditionalHead;
-    while (current != NULL) {
-        Serial.print(current->tag);
-        Serial.print(F(";\t"));
-        Serial.print(current->description);
-        Serial.println("");
-        current = current->next;
-    }
+  // if (commandsAdditionalHead != nulptr) {
+  //   DeviceCommandFunctionEntry *current = commandsAdditionalHead;
+  //   while (current != NULL) {
+  //       Serial.print(current->tag);
+  //       Serial.print(F(";\t"));
+  //       Serial.print(current->description);
+  //       Serial.println();
+  //       current = current->next;
+  //   }
+  // }
+  for (const auto& pair : _commandsAdditional) {
+    Serial.print(pair.second->tag);
+    Serial.print(F(";\t"));
+    Serial.print(pair.second->description);
+    Serial.println();
   }
 
   Serial.println(F("")); 
@@ -74,94 +80,42 @@ void deviceCommands::interpretCommandBufferI2CScanner() {
 #endif
 
 DeviceCommandFunctionPtr deviceCommands::getCommandAdditionalFunction(char key) {
-  if (commandsAdditionalHead == NULL)
-    return NULL;
+  // if (commandsAdditionalHead == NULL)
+  //   return NULL;
 
   // Serial.print("key: ");
   // Serial.println(key);
-  DeviceCommandFunctionEntry *current = commandsAdditionalHead;
-  while (current != NULL) {
-    // Serial.print("key.current: ");
-    // Serial.println(current->key);
-      if (current->key != key) {
-        current = current->next;
-        continue;
-      }
-
+  auto results = _commandsAdditional.find(key);
+  if (results != _commandsAdditional.end()) {
+#ifdef DEBUG
+    Serial.printf("getCommandAdditionalFunction...found '%c'\n", key);
+#endif
+    DeviceCommandFunctionEntry *current = _commandsAdditional.at(key);
+    if (current != nullptr) {
+#ifdef DEBUG
+      Serial.printf("getCommandAdditionalFunction...did not find '%c'\n", key);
+#endif
       return current->func;
+    }
   }
+#ifdef DEBUG
+  else
+    Serial.println("getCommandAdditionalFunction...did not find it...");
+#endif
+
+  // DeviceCommandFunctionEntry *current = commandsAdditionalHead;
+  // while (current != NULL) {
+  //   // Serial.print("key.current: ");
+  //   // Serial.println(current->key);
+  //     if (current->key != key) {
+  //       current = current->next;
+  //       continue;
+  //     }
+
+  //     return current->func;
+  // }
 
   return NULL; // Key not found
-}
-
-//  Available commands.
-//  The commands can be used via the serial command line or via the Android console
-
-//  h   help
-//  i   i2c scanner - DEV only
-//
-// Other commands are added by the initCommand method
-//
-void deviceCommands::interpretCommandBuffer() {
-  uint8_t command = commandBuffer[0];
-  // uint8_t command1 = commandBuffer[1];
-
-#if defined(DWBUG) && defined(DEBUG_COMMAND)
-  debug(F("interpretCommandBuffer.command"), command);
-  Serial.print(F("interpretCommandBuffer.commandBuffer="));
-  for (int i = 0; i < commandbufferLength; i++) {
-    Serial.print(commandBuffer[i]);
-    // Serial.printf("%c", commandBuffer[i]);
-    // Serial.printf("%d", commandBuffer[i]);
-  }
-  Serial.println(F(""));
-#endif  
-
-#if defined(DWBUG) && defined(DEBUG_COMMAND)
-  Serial.println(F(""));
-  Serial.println(F(""));
-  Serial.println(commandBuffer[0]);
-  Serial.println(commandBuffer[1]);
-  Serial.println(F(""));
-  Serial.println(F(""));
-  Serial.println(F(""));
-#endif
-
-  // help
-  if (command == 'h') {
-    interpretCommandBufferHelp();
-    return;
-  }
-#if defined(DEV) && defined(I2CSCANNER_ENABLED)
-  // i2c scanner - debug only
-  if (command == 'i') {
-    interpretCommandBufferI2CScanner();
-    return;
-  }
-#endif
-#ifdef DEV
-  // test command
-  if (command == 'y') {
-    return;
-  }
-#endif
-
-  DeviceCommandFunctionPtr commandFunc = getCommandAdditionalFunction(command);
-  if (commandFunc != NULL) {
-    commandFunc(commandBuffer, commandBufferLength); // Call the function
-    return;
-  }
-
-  Serial.print(F("$UNKNOWN command: "));
-  // Serial.println(commandBuffer);
-  for (int i = 0; i < commandBufferLength; i++)
-    Serial.print(commandBuffer[i]);
-  Serial.println();
-}
-
-void deviceCommands::resetCommandBuffer() {
-  memset(commandBuffer, 0, sizeof(commandBuffer));
-  commandBufferLength = 0;
 }
 
 void deviceCommands::initCommand(char key, DeviceCommandFunctionPtr func, bool visible, const char *tag, const char *description) {
@@ -173,11 +127,13 @@ void deviceCommands::initCommand(char key, DeviceCommandFunctionPtr func, bool v
   strcpy(item->description, description);
   item->next = NULL;
 
-  if (commandsAdditionalHead == NULL)
-    commandsAdditionalHead = item;
-  if (commandsAdditionalLatest != NULL)
-    commandsAdditionalLatest->next = item;
-  commandsAdditionalLatest = item;
+  // if (commandsAdditionalHead == NULL)
+  //   commandsAdditionalHead = item;
+  // if (commandsAdditionalLatest != NULL)
+  //   commandsAdditionalLatest->next = item;
+  // commandsAdditionalLatest = item;
+
+  _commandsAdditional.insert(std::make_pair(key, item));
 }
 
 void deviceCommands::interpretBuffer() {
@@ -223,6 +179,71 @@ void deviceCommands::interpretBuffer(uint8_t *commandBufferI, int length) {
   resetCommandBuffer();
 }
 
+//  Available commands.
+//  The commands can be used via the serial command line or via the Android console
+
+//  h   help
+//  i   i2c scanner - DEV only
+//
+// Other commands are added by the initCommand method
+//
+void deviceCommands::interpretCommandBuffer() {
+  uint8_t command = commandBuffer[0];
+  // uint8_t command1 = commandBuffer[1];
+
+#if defined(DWBUG) && defined(DEBUG_COMMAND)
+  debug(F("interpretCommandBuffer.command"), command);
+  Serial.print(F("interpretCommandBuffer.commandBuffer="));
+  for (int i = 0; i < commandbufferLength; i++) {
+    Serial.print(commandBuffer[i]);
+    // Serial.printf("%c", commandBuffer[i]);
+    // Serial.printf("%d", commandBuffer[i]);
+  }
+  Serial.println(F(""));
+#endif  
+
+#if defined(DWBUG) && defined(DEBUG_COMMAND)
+  Serial.println(F(""));
+  Serial.println(F(""));
+  Serial.println(commandBuffer[0]);
+  Serial.println(commandBuffer[1]);
+  Serial.println(F(""));
+  Serial.println(F(""));
+  Serial.println(F(""));
+#endif
+
+  // help
+  if (command == COMMAND_HELP) {
+    interpretCommandBufferHelp();
+    return;
+  }
+#if defined(DEV) && defined(I2CSCANNER_ENABLED)
+  // i2c scanner - debug only
+  if (command == COMMAND_I2CSCANNER) {
+    interpretCommandBufferI2CScanner();
+    return;
+  }
+#endif
+#ifdef DEV
+  // test command
+  if (command == COMMAND_TEST) {
+    return;
+  }
+#endif
+
+  DeviceCommandFunctionPtr commandFunc = getCommandAdditionalFunction(command);
+  if (commandFunc != NULL) {
+    commandFunc(&commandBuffer[1], commandBufferLength); // Call the function, remove the leading 'command'
+    return;
+  }
+
+  Serial.print(F("$UNKNOWN command: "));
+  // Serial.println(commandBuffer);
+  for (int i = 0; i < commandBufferLength; i++)
+    Serial.print(commandBuffer[i]);
+  Serial.println();
+}
+
 bool deviceCommands::readSerial(unsigned long timestamp, unsigned long delta) {
   uint8_t readVal = ' ';
 
@@ -238,7 +259,7 @@ bool deviceCommands::readSerial(unsigned long timestamp, unsigned long delta) {
 #endif
 // #endif
 
-    if (readVal == ';') {
+    if (readVal == COMMAND_STOP_BYTE) {
       commandBuffer[commandBufferLength++] = '\0';
 
 // #if defined(DWBUG) && defined(DEBUG_COMMAND)
@@ -282,6 +303,11 @@ bool deviceCommands::readSerialInterpret(unsigned long timestamp, unsigned long 
     }
 
     return false;
+}
+
+void deviceCommands::resetCommandBuffer() {
+  memset(commandBuffer, 0, sizeof(commandBuffer));
+  commandBufferLength = 0;
 }
 
 deviceCommands _deviceCommands;
