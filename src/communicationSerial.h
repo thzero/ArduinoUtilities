@@ -38,6 +38,8 @@ class CommunicationSerial {
     int process(unsigned long timestamp, unsigned long delta);
     int queue(uint16_t command);
     int queue(uint16_t command, uint8_t *byteArray, size_t size);
+    int send(uint16_t command);
+    bool healthy();
 
     template <typename T>
     // int queuePacked(uint16_t command, const T& val, const uint16_t& size = sizeof(T));
@@ -68,6 +70,9 @@ class CommunicationSerial {
     std::map<uint16_t, CommunicationCommandFunctionEntry*> _commands;
     CircularQueue<CommuicationQueueMessageStruct, COMMUNICATION_QUEUE_LENGTH> _queueing;
     SerialTransfer _transfer;
+
+    bool _health = false;
+    uint16_t _healthMs = 0;
 };
 
 extern CommunicationSerial _communicationSerialObj;

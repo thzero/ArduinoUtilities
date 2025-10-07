@@ -38,7 +38,7 @@ int monitorHardware::memoryHeap() {
 }
 
 int monitorHardware::memoryHeapKb() {
-    return _instance->memoryHeap();
+    return _instance->memoryHeapKb();
 }
 
 int monitorHardware::memoryHeapInternal() {
@@ -46,7 +46,7 @@ int monitorHardware::memoryHeapInternal() {
 }
 
 int monitorHardware::memoryHeapInternalKb() {
-    return _instance->memoryHeapInternal();
+    return _instance->memoryHeapInternalKb();
 }
 
 int monitorHardware::memoryHeapMinimum() {
@@ -54,7 +54,7 @@ int monitorHardware::memoryHeapMinimum() {
 }
 
 int monitorHardware::memoryHeapMinimumKb() {
-    return _instance->memoryHeapMinimum();
+    return _instance->memoryHeapMinimumKb();
 }
 
 int monitorHardware::memoryRam() {
@@ -62,7 +62,7 @@ int monitorHardware::memoryRam() {
 }
 
 int monitorHardware::memoryRamKb() {
-    return _instance->memoryRam();
+    return _instance->memoryRamKb();
 }
 
 int monitorHardware::memoryStack() {
@@ -70,7 +70,7 @@ int monitorHardware::memoryStack() {
 }
 
 int monitorHardware::memoryStackKb() {
-    return _instance->memoryStack();
+    return _instance->memoryStackKb();
 }
 
 float monitorHardware::voltage() {
