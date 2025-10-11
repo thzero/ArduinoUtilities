@@ -7,8 +7,8 @@
 #include <CircularQueue.hpp>
 #include <map>
 
-#define BUFFER_MAX_SIZE 1024
-#define BUFFER_MAX_MESSAGE_SIZE 1021 // start - command - size - size - bytes - crc - end
+#include "communicationData.h"
+
 #define COMMUNICATION_QUEUE_LENGTH 5
 // #define DEBUG_COMMUNICATION
 // #define DEBUG_COMMUNICATION_COMMAND
@@ -17,25 +17,6 @@
 // #define DEBUG_COMMUNICATION_QUEUE
 // #define DEBUG_COMMUNICATION_READ
 // #define DEBUG_COMMUNICATION_SEND
-
-const uint8_t MESSAGE_START_BYTE = 0x7E;
-const uint8_t MESSAGE_STOP_BYTE  = 0x81;
-
-struct CommuicationQueueMessageStruct {
-  uint16_t command;
-  size_t size;
-  uint8_t buffer[BUFFER_MAX_MESSAGE_SIZE];
-  uint8_t crc;
-};
-
-typedef void (*CommunicationCommandFunctionPtr)(unsigned long timestamp, unsigned long deltaElapsed, CommuicationQueueMessageStruct communication);
-typedef void (*CommunicationHandlerFunctionPtr)(unsigned long timestamp, unsigned long deltaElapsed, CommuicationQueueMessageStruct communication);
-
-struct CommunicationCommandFunctionEntry {
-    uint16_t command;
-    CommunicationCommandFunctionPtr func;
-    struct CommunicationCommandFunctionEntry *next;
-};
 
 class CommunicationSerial {
   public:

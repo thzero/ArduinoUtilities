@@ -11,11 +11,11 @@
 #include <utilities.h>
 
 #if defined(ESP32)
-SemaphoreHandle_t mutex;
+SemaphoreHandle_t communicationSerialMutexOutput;
 // std::mutex serial_mtx;
 #endif
 #if defined(TEENSYDUINO)
-Threads::Mutex mutexOutput;
+Threads::Mutex communicationSerialMutexOutput;
 #endif
 
 CommunicationSerial::CommunicationSerial() {
@@ -93,21 +93,21 @@ int CommunicationSerial::process(unsigned long timestamp, unsigned long delta) {
   }
 
 #if defined(TEENSYDUINO)
-  // Threads::Scope m(mutexOutput); // lock on creation
-  mutexOutput.lock();
+  // Threads::Scope m(communicationSerialMutexOutput); // lock on creation
+  communicationSerialMutexOutput.lock();
 #endif
 #if defined(ESP32)
-  if (xSemaphoreTake(mutex, portMAX_DELAY)) {
+  if (xSemaphoreTake(communicationSerialMutexOutput, portMAX_DELAY)) {
 #endif
 
   if (_queueing.isEmpty()) {
     // Serial.println(F("communication-serial-process: nothing to send."));
 #if defined(TEENSYDUINO)
-    mutexOutput.unlock();
+    communicationSerialMutexOutput.unlock();
 #endif
 
 #if defined(ESP32)
-    xSemaphoreGive(mutex); // Release the mutex
+    xSemaphoreGive(communicationSerialMutexOutput); // Release the mutex
 #endif
     return 2; // nothing to send.
   }
@@ -146,11 +146,11 @@ int CommunicationSerial::process(unsigned long timestamp, unsigned long delta) {
 #endif
 
 #if defined(ESP32)
-    xSemaphoreGive(mutex); // Release the mutex
+    xSemaphoreGive(communicationSerialMutexOutput); // Release the mutex
   }
 #endif
 #if defined(TEENSYDUINO)
-  mutexOutput.unlock();
+  communicationSerialMutexOutput.unlock();
 #endif
 
   return 1;
@@ -168,21 +168,21 @@ int CommunicationSerial::queue(uint16_t command) {
 #endif
 
 #if defined(TEENSYDUINO)
-  // Threads::Scope m(mutexOutput); // lock on creation
-  mutexOutput.lock();
+  // Threads::Scope m(communicationSerialMutexOutput); // lock on creation
+  communicationSerialMutexOutput.lock();
 #endif
 #if defined(ESP32)
-  if (xSemaphoreTake(mutex, portMAX_DELAY)) {
+  if (xSemaphoreTake(communicationSerialMutexOutput, portMAX_DELAY)) {
 #endif
 
   if (_queueing.size() >= COMMUNICATION_QUEUE_LENGTH) {
     Serial.println(F("communication-serial-queue: all queues are full."));
     
 #if defined(ESP32)
-    xSemaphoreGive(mutex); // Release the mutex
+    xSemaphoreGive(communicationSerialMutexOutput); // Release the mutex
 #endif
 #if defined(TEENSYDUINO)
-    mutexOutput.unlock();
+    communicationSerialMutexOutput.unlock();
 #endif
 
     return -2; // exceeded queue length
@@ -211,11 +211,11 @@ int CommunicationSerial::queue(uint16_t command) {
 #endif
 
 #if defined(ESP32)
-    xSemaphoreGive(mutex); // Release the mutex
+    xSemaphoreGive(communicationSerialMutexOutput); // Release the mutex
   }
 #endif
 #if defined(TEENSYDUINO)
-  mutexOutput.unlock();
+  communicationSerialMutexOutput.unlock();
 #endif
 
   return 1;
@@ -255,21 +255,21 @@ int CommunicationSerial::queue(uint16_t command, uint8_t *byteArray, size_t size
 #endif
 
 #if defined(TEENSYDUINO)
-  // Threads::Scope m(mutexOutput); // lock on creation
-  mutexOutput.lock();
+  // Threads::Scope m(communicationSerialMutexOutput); // lock on creation
+  communicationSerialMutexOutput.lock();
 #endif
 #if defined(ESP32)
-  if (xSemaphoreTake(mutex, portMAX_DELAY)) {
+  if (xSemaphoreTake(communicationSerialMutexOutput, portMAX_DELAY)) {
 #endif
 
   if (_queueing.size() >= COMMUNICATION_QUEUE_LENGTH) {
     Serial.println(F("communication-serial-queue: all queues are full."));
 
 #if defined(ESP32)
-    xSemaphoreGive(mutex); // Release the mutex
+    xSemaphoreGive(communicationSerialMutexOutput); // Release the mutex
 #endif
 #if defined(TEENSYDUINO)
-    mutexOutput.unlock();
+    communicationSerialMutexOutput.unlock();
 #endif
 
     return -2; // exceeded queue length
@@ -282,11 +282,11 @@ int CommunicationSerial::queue(uint16_t command, uint8_t *byteArray, size_t size
 #endif
 
 #if defined(ESP32)
-    xSemaphoreGive(mutex); // Release the mutex
+    xSemaphoreGive(communicationSerialMutexOutput); // Release the mutex
   }
 #endif
 #if defined(TEENSYDUINO)
-  mutexOutput.unlock();
+  communicationSerialMutexOutput.unlock();
 #endif
 
   return 1;
@@ -426,8 +426,8 @@ Serial1.addMemoryForRead(&bigserialbuffer, sizeof(bigserialbuffer));
   Serial.println(F("\t...enabled transfer on Serial2."));
 
 #if defined(ESP32)
-  mutex = xSemaphoreCreateMutex();
-  if (mutex == NULL) {
+  communicationSerialMutexOutput = xSemaphoreCreateMutex();
+  if (communicationSerialMutexOutput == NULL) {
     Serial.println(F("Failed to create mutex"));
     return false;
   }
@@ -457,8 +457,8 @@ bool CommunicationSerial::setup(unsigned long baud, uint32_t config, int8_t rxPi
   Serial.println(F("\t...enabled transfer on Serial2."));
 
 #if defined(ESP32)
-  mutex = xSemaphoreCreateMutex();
-  if (mutex == NULL) {
+  communicationSerialMutexOutput = xSemaphoreCreateMutex();
+  if (communicationSerialMutexOutput == NULL) {
     Serial.println(F("Failed to create mutex"));
     return false;
   }
