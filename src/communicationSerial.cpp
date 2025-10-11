@@ -11,11 +11,11 @@
 #include <utilities.h>
 
 #if defined(ESP32)
-SemaphoreHandle_t mutex;
+SemaphoreHandle_t communicationSerialMutexOutput;
 // std::mutex serial_mtx;
 #endif
 #if defined(TEENSYDUINO)
-Threads::Mutex mutexOutput;
+Threads::Mutex communicationSerialMutexOutput;
 #endif
 
 CommunicationSerial::CommunicationSerial() {
@@ -25,7 +25,7 @@ CommunicationCommandFunctionPtr CommunicationSerial::getCommandFunction(uint16_t
   // if (commandsHead == NULL)
   //   return NULL;
 
-#ifdef DEBUG_COMMUNICATION
+#ifdef DEBUG_COMMUNICATION_COMMAND
   Serial.printf(F("getCommandFunction.command: "));
   Serial.println(command);
   // for (const auto& pair : _commands) {
@@ -36,18 +36,18 @@ CommunicationCommandFunctionPtr CommunicationSerial::getCommandFunction(uint16_t
 
   auto results = _commands.find(command);
   if (results != _commands.end()) {
-#ifdef DEBUG_COMMUNICATION
+#ifdef DEBUG_COMMUNICATION_COMMAND
     Serial.printf(F("getCommandFunction...found '%d'\n"), command);
 #endif
     CommunicationCommandFunctionEntry *current = _commands.at(command);
     if (current != nullptr) {
-#ifdef DEBUG_COMMUNICATION
+#ifdef DEBUG_COMMUNICATION_COMMAND
       Serial.printf(F("getCommandFunction...found '%d'\n"), command);
 #endif
       return current->func;
     }
   }
-#ifdef DEBUG_COMMUNICATION
+#ifdef DEBUG_COMMUNICATION_COMMAND
   else
     Serial.printf(F("getCommandFunction...did not find  '%d'\n"), command);
 #endif
@@ -93,21 +93,21 @@ int CommunicationSerial::process(unsigned long timestamp, unsigned long delta) {
   }
 
 #if defined(TEENSYDUINO)
-  // Threads::Scope m(mutexOutput); // lock on creation
-  mutexOutput.lock();
+  // Threads::Scope m(communicationSerialMutexOutput); // lock on creation
+  communicationSerialMutexOutput.lock();
 #endif
 #if defined(ESP32)
-  if (xSemaphoreTake(mutex, portMAX_DELAY)) {
+  if (xSemaphoreTake(communicationSerialMutexOutput, portMAX_DELAY)) {
 #endif
 
   if (_queueing.isEmpty()) {
     // Serial.println(F("communication-serial-process: nothing to send."));
 #if defined(TEENSYDUINO)
-    mutexOutput.unlock();
+    communicationSerialMutexOutput.unlock();
 #endif
 
 #if defined(ESP32)
-    xSemaphoreGive(mutex); // Release the mutex
+    xSemaphoreGive(communicationSerialMutexOutput); // Release the mutex
 #endif
     return 2; // nothing to send.
   }
@@ -117,7 +117,7 @@ int CommunicationSerial::process(unsigned long timestamp, unsigned long delta) {
   CommuicationQueueMessageStruct message = _queueing.front();
   _queueing.dequeue();
 
-#ifdef DEBUG_COMMUNICATION
+#ifdef DEBUG_COMMUNICATION_PROCESS
   Serial.printf(F("communication-serial-process: message command to send: %d\n"), message.command);
   Serial.printf(F("communication-serial-process: message bytes size to send: %d\n"), message.size);
 
@@ -141,16 +141,16 @@ int CommunicationSerial::process(unsigned long timestamp, unsigned long delta) {
 
   memset(message.buffer, 0, BUFFER_MAX_SIZE);
 
-#ifdef DEBUG_COMMUNICATION
+#ifdef DEBUG_COMMUNICATION_PROCESS
   Serial.println(F("communication-serial-process: sent buffer."));
 #endif
 
 #if defined(ESP32)
-    xSemaphoreGive(mutex); // Release the mutex
+    xSemaphoreGive(communicationSerialMutexOutput); // Release the mutex
   }
 #endif
 #if defined(TEENSYDUINO)
-  mutexOutput.unlock();
+  communicationSerialMutexOutput.unlock();
 #endif
 
   return 1;
@@ -162,27 +162,27 @@ int CommunicationSerial::queue(uint16_t command) {
     return 0;
   }
 
-#ifdef DEBUG_COMMUNICATION
+#ifdef DEBUG_COMMUNICATION_QUEUE
   Serial.printf(F("communication-serial-queue: message command: "));
   Serial.printf(F("%d\n"), command);
 #endif
 
 #if defined(TEENSYDUINO)
-  // Threads::Scope m(mutexOutput); // lock on creation
-  mutexOutput.lock();
+  // Threads::Scope m(communicationSerialMutexOutput); // lock on creation
+  communicationSerialMutexOutput.lock();
 #endif
 #if defined(ESP32)
-  if (xSemaphoreTake(mutex, portMAX_DELAY)) {
+  if (xSemaphoreTake(communicationSerialMutexOutput, portMAX_DELAY)) {
 #endif
 
   if (_queueing.size() >= COMMUNICATION_QUEUE_LENGTH) {
     Serial.println(F("communication-serial-queue: all queues are full."));
     
 #if defined(ESP32)
-    xSemaphoreGive(mutex); // Release the mutex
+    xSemaphoreGive(communicationSerialMutexOutput); // Release the mutex
 #endif
 #if defined(TEENSYDUINO)
-    mutexOutput.unlock();
+    communicationSerialMutexOutput.unlock();
 #endif
 
     return -2; // exceeded queue length
@@ -195,7 +195,7 @@ int CommunicationSerial::queue(uint16_t command) {
   message.size = 1;
   message.command = command;
 
-#ifdef DEBUG_COMMUNICATION
+#ifdef DEBUG_COMMUNICATION_QUEUE
   Serial.printf(F("communication-serial-queue: message command to send: %d\n"), message.command);
   Serial.printf(F("communication-serial-queue: message size to send: %d\n"), message.size);
   Serial.println(F("communication-serial-queue: message bytes: "));
@@ -206,16 +206,16 @@ int CommunicationSerial::queue(uint16_t command) {
 
   _queueing.enqueue(message);
 
-#ifdef DEBUG_COMMUNICATION
+#ifdef DEBUG_COMMUNICATION_QUEUE
   Serial.println(F("communication-serial-queue: message queued."));
 #endif
 
 #if defined(ESP32)
-    xSemaphoreGive(mutex); // Release the mutex
+    xSemaphoreGive(communicationSerialMutexOutput); // Release the mutex
   }
 #endif
 #if defined(TEENSYDUINO)
-  mutexOutput.unlock();
+  communicationSerialMutexOutput.unlock();
 #endif
 
   return 1;
@@ -232,7 +232,7 @@ int CommunicationSerial::queue(uint16_t command, uint8_t *byteArray, size_t size
     return -1; // exceeded queue length
   }
 
-#ifdef DEBUG_COMMUNICATION
+#ifdef DEBUG_COMMUNICATION_QUEUE
   Serial.printf(F("communication-serial-queue: message command: %d\n"), command);
   Serial.println(F("communication-serial-queue: requested bytes: "));
   for (size_t i = 0; i < size; i++)
@@ -245,7 +245,7 @@ int CommunicationSerial::queue(uint16_t command, uint8_t *byteArray, size_t size
   message.size = size;
   message.command = command;
 
-#ifdef DEBUG_COMMUNICATION
+#ifdef DEBUG_COMMUNICATION_QUEUE
   Serial.printf(F("communication-serial-queue: message command to send: %d\n"), message.command);
   Serial.printf(F("communication-serial-queue: message size to send: %d\n"), message.size);
   Serial.println(F("communication-serial-queue: message bytes: "));
@@ -255,21 +255,21 @@ int CommunicationSerial::queue(uint16_t command, uint8_t *byteArray, size_t size
 #endif
 
 #if defined(TEENSYDUINO)
-  // Threads::Scope m(mutexOutput); // lock on creation
-  mutexOutput.lock();
+  // Threads::Scope m(communicationSerialMutexOutput); // lock on creation
+  communicationSerialMutexOutput.lock();
 #endif
 #if defined(ESP32)
-  if (xSemaphoreTake(mutex, portMAX_DELAY)) {
+  if (xSemaphoreTake(communicationSerialMutexOutput, portMAX_DELAY)) {
 #endif
 
   if (_queueing.size() >= COMMUNICATION_QUEUE_LENGTH) {
     Serial.println(F("communication-serial-queue: all queues are full."));
 
 #if defined(ESP32)
-    xSemaphoreGive(mutex); // Release the mutex
+    xSemaphoreGive(communicationSerialMutexOutput); // Release the mutex
 #endif
 #if defined(TEENSYDUINO)
-    mutexOutput.unlock();
+    communicationSerialMutexOutput.unlock();
 #endif
 
     return -2; // exceeded queue length
@@ -277,16 +277,16 @@ int CommunicationSerial::queue(uint16_t command, uint8_t *byteArray, size_t size
 
   _queueing.enqueue(message);
 
-#ifdef DEBUG_COMMUNICATION
+#ifdef DEBUG_COMMUNICATION_QUEUE
   Serial.println(F("communication-serial-queue: message queued."));
 #endif
 
 #if defined(ESP32)
-    xSemaphoreGive(mutex); // Release the mutex
+    xSemaphoreGive(communicationSerialMutexOutput); // Release the mutex
   }
 #endif
 #if defined(TEENSYDUINO)
-  mutexOutput.unlock();
+  communicationSerialMutexOutput.unlock();
 #endif
 
   return 1;
@@ -299,21 +299,21 @@ size_t CommunicationSerial::read(CommunicationHandlerFunctionPtr func, unsigned 
     // uint8_t buffer[BUFFER_MAX_SIZE];
     // size_t size;
     communication.command = _transfer.currentCommand();
-#ifdef DEBUG_COMMUNICATION
+#ifdef DEBUG_COMMUNICATION_READ
     Serial.printf(F("communication-serial-read: message command received: %d %d %d\n"), communication.command, _transfer.currentCommand(), (communication.command == _transfer.currentCommand()));
 #endif
     communication.size = _transfer.currentReceived();
-#ifdef DEBUG_COMMUNICATION
+#ifdef DEBUG_COMMUNICATION_READ
     Serial.printf(F("communication-serial-read: message bytes to receive: %d\n"), communication.size);
 #endif
 //     uint16_t recSize = 0;  // bytes we've processed from the receive buffer
 //     recSize = _transfer.rxObj(communication.size, sizeof(size_t));
-#ifdef DEBUG_COMMUNICATION
+#ifdef DEBUG_COMMUNICATION_READ
     Serial.printf(F("communication-serial-read: message bytes to receive: %d\n"), communication.size);
 #endif
     // recSize = _transfer.rxObj(communication.buffer, recSize, communication.size);
     uint16_t recSize = _transfer.rxObj(communication.buffer, 0, communication.size);
-#ifdef DEBUG_COMMUNICATION
+#ifdef DEBUG_COMMUNICATION_READ
     Serial.printf(F("communication-serial-read: message bytes to received: %d\n"), recSize);
     Serial.printf(F("communication-serial-read: message bytes received: "));
     for (size_t i = 0; i < communication.size; i++)
@@ -322,7 +322,7 @@ size_t CommunicationSerial::read(CommunicationHandlerFunctionPtr func, unsigned 
 #endif
 
     if (communication.command == COMMAND_COMMUNICATION_HEALTH) {
-#ifdef DEBUG_COMMUNICATION
+#ifdef DEBUG_COMMUNICATION_READ
       Serial.println(F("communication-serial-read: received health request..."));
 #endif
       _health = true;
@@ -352,12 +352,12 @@ size_t CommunicationSerial::read(CommunicationHandlerFunctionPtr func, unsigned 
 
 //     communication.size = Serial2.readBytesUntil(';', communication.buffer, BUFFER_MAX_SIZE - 1);
     
-// #ifdef DEBUG_COMMUNICATION
+// #ifdef DEBUG_COMMUNICATION_READ
 //     Serial.printf(F("communication-serial-read: message size received: %d\n"), communication.size);
 // #endif
 //     // recSize = _transfer.rxObj(communication.buffer, recSize, communication.size);
 
-// #ifdef DEBUG_COMMUNICATION
+// #ifdef DEBUG_COMMUNICATION_READ
 //     Serial.println(F("communication-serial-read: message bytes to receive: "));
 //     for (int i = 0; i < communication.size; i++)
 //       Serial.printf(F(%d "), communication.buffer[i]);
@@ -373,7 +373,7 @@ size_t CommunicationSerial::read(CommunicationHandlerFunctionPtr func, unsigned 
 }
 
 int CommunicationSerial::send(uint16_t command) {
-#ifdef DEBUG_COMMUNICATION
+#ifdef DEBUG_COMMUNICATION_SEND
   Serial.printf(F("communication-serial-send: message command: "));
   Serial.printf(F("%d\n"), command);
 #endif
@@ -385,7 +385,7 @@ int CommunicationSerial::send(uint16_t command) {
   message.size = 1;
   message.command = command;
 
-#ifdef DEBUG_COMMUNICATION
+#ifdef DEBUG_COMMUNICATION_SEND
   Serial.printf(F("communication-serial-send: message command to send: %d\n"), message.command);
   Serial.printf(F("communication-serial-send: message size to send: %d\n"), message.size);
   Serial.println(F("communication-serial-send: message bytes: "));
@@ -417,7 +417,7 @@ Serial1.addMemoryForRead(&bigserialbuffer, sizeof(bigserialbuffer));
   Serial.println(F("\t...enabled Serial2."));
 
   Serial.println(F("\tEable transfer on Serial2."));
-#ifdef DEBUG_COMMUNICATION
+#ifdef DEBUG_COMMUNICATION_INTERNAL
   uint8_t debug = 2;
 #else
   uint8_t debug = 0;
@@ -426,8 +426,8 @@ Serial1.addMemoryForRead(&bigserialbuffer, sizeof(bigserialbuffer));
   Serial.println(F("\t...enabled transfer on Serial2."));
 
 #if defined(ESP32)
-  mutex = xSemaphoreCreateMutex();
-  if (mutex == NULL) {
+  communicationSerialMutexOutput = xSemaphoreCreateMutex();
+  if (communicationSerialMutexOutput == NULL) {
     Serial.println(F("Failed to create mutex"));
     return false;
   }
@@ -457,8 +457,8 @@ bool CommunicationSerial::setup(unsigned long baud, uint32_t config, int8_t rxPi
   Serial.println(F("\t...enabled transfer on Serial2."));
 
 #if defined(ESP32)
-  mutex = xSemaphoreCreateMutex();
-  if (mutex == NULL) {
+  communicationSerialMutexOutput = xSemaphoreCreateMutex();
+  if (communicationSerialMutexOutput == NULL) {
     Serial.println(F("Failed to create mutex"));
     return false;
   }
