@@ -158,7 +158,9 @@ int CommunicationSerial::process(unsigned long timestamp, unsigned long delta) {
 
 int CommunicationSerial::queue(uint16_t command) {
   if (!_health) {
+#ifdef DEBUG_COMMUNICATION_PROCESS
     Serial.printf(F("communication-serial-queue: health is %d.\n"), _health);
+#endif
     return 0;
   }
 
@@ -223,7 +225,9 @@ int CommunicationSerial::queue(uint16_t command) {
 
 int CommunicationSerial::queue(uint16_t command, uint8_t *byteArray, size_t size) {
   if (!_health) {
+#ifdef DEBUG_COMMUNICATION_PROCESS
     Serial.printf(F("communication-serial-queue: health is %d.\n"), _health);
+#endif
     return 0;
   }
 
