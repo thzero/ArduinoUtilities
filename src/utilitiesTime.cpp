@@ -5,10 +5,10 @@
 #include <TimeLib.h>
 #endif
 
-#include "communicationConstants.h"
-#include "communicationSerial.h"
 #include <utilities.h>
 #include <utilitiesTime.h>
+
+#include "communicationConstants.h"
 
 // char* convertTime(unsigned long epochS) {
 //     char buff[32];
@@ -102,7 +102,7 @@ void rtcTimestampCommandSend(unsigned long timestamp) {
   Serial.println();
   // Serial2.write(buffer, size);
   // communicationSerialQueue(buffer, size);
-  // _communicationSerialObj.queue(buffer, size);
+  // _communicationSerialInternal.queue(buffer, size);
   Serial.println(F("...sent"));
 }
 
@@ -200,7 +200,12 @@ void rtcTimestampCommand(uint8_t* commandBuffer, uint16_t commandBufferLength) {
 //   rtcPrintTime();
 }
 
-void rtcTimestampCommandSend() {
+void rtcTimestampCommandSend(CommunicationSerialQueue* serial) {
+  if (serial == nullptr) {
+    Serial.println("rtcTimestampCommandSend::invalid serial.");
+    return;
+  }
+
   // size_t size = sizeof(unsigned long) + 2;
   // uint8_t buffer[size];
   // memset(buffer, 0, size);
@@ -231,8 +236,8 @@ void rtcTimestampCommandSend() {
 #endif
   // Serial2.write(buffer, size);
   // communicationSerialQueue(buffer, size);
-  _communicationSerialObj.queue(COMMAND_COMMUNICATION_RTC, buffer, size);
-  // _communicationSerialObj.queue(2, buffer, size);
+  serial->queue(COMMAND_COMMUNICATION_RTC, buffer, size);
+  // serial->queue(2, buffer, size);
   Serial.println(F("...sent"));
 }
 
