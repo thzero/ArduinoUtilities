@@ -200,7 +200,7 @@ void rtcTimestampCommand(uint8_t* commandBuffer, uint16_t commandBufferLength) {
 //   rtcPrintTime();
 }
 
-void rtcTimestampCommandSend(CommunicationSerial* serial) {
+void rtcTimestampCommandSend(CommunicationSerialQueue* serial) {
   if (serial == nullptr) {
     Serial.println("rtcTimestampCommandSend::invalid serial.");
     return;
