@@ -62,6 +62,17 @@ unsigned long convertUnsignedByteArrayToUnsignedLong(uint8_t *byteArray) {
   return value;
 }
 
+uint16_t convertUnsignedByteArrayToUnsignedShort(uint8_t *byteArray) {
+  unsigned long value = 0;
+  for (size_t i = 0; i < sizeof(uint16_t); i++) {
+    // Serial.printf("%d ", byteArray[i]);
+    // Serial.printf("b%d \n", (uint8_t)byteArray[i]);
+    value |= byteArray[i] << (i * 8); // Combine bytes
+  }
+  // Serial.println();
+  return value;
+}
+
 void convertUnsignedIntToByteArray(unsigned int value, uint8_t *byteArray) {
   for (size_t i = 0; i < sizeof(unsigned int); i++) {
     // Serial.printf("%d ", ((value >> (i * 8)) & 0xFF));
