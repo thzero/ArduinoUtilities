@@ -38,25 +38,6 @@ void rtcPrintTime() {
 }
 
 void rtcTimestampCommand(uint8_t* commandBuffer, uint16_t commandBufferLength) {
-//   Serial.print(F("rtcTimestampCommand... commandBufferLength="));
-//   Serial.println(commandBufferLength);
-
-//   size_t size = sizeof(unsigned long) + 1;
-// //   Serial.print(F("rtcTimestampCommand... size="));
-// //   Serial.println(size);
-//   if ((commandBufferLength < size) || (commandBufferLength > size)) {
-//     Serial.printf(F("Invalid timestamp; requires %d character UNIX timestamp."), size);
-//     return;
-//   }
-
-//   unsigned long epoch = convertUnsignedByteArrayToUnsignedLong(&commandBuffer[1]);
-//   Serial.printf(F("rtcTimestampCommand... setting '%d' as the epoch.\n"), epoch);
-//   Serial.println(epoch);
-
-//   rtcSetTime(epoch);
-
-//   Serial.print(F("Current time is: "));
-//   rtcPrintTime();
   size_t size = sizeof(unsigned long);
 //   Serial.print(F("rtcTimestampCommand... size="));
 //   Serial.println(size);
