@@ -20,6 +20,8 @@ extern void dumpBuffers(const char *title, const uint8_t *buf, size_t start, siz
 extern bool verifyAndDumpDifference(const char *a_title, const uint8_t *a_buf, size_t a_size, const char *b_title, const uint8_t *b_buf, size_t b_size);
 extern void initializeBuffers(uint8_t *tx, uint8_t *rx, size_t size, size_t offset = 0);
 
+extern void fetchMAC(uint8_t *mac);
+
 #endif
 
 #endif
