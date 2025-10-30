@@ -7,15 +7,15 @@
 const uint8_t MESSAGE_START_BYTE = 0x7E;
 const uint8_t MESSAGE_STOP_BYTE  = 0x81;
 
-struct CommuicationMessageStruct {
+struct CommunicationMessageStruct {
   uint16_t command;
   size_t size;
   uint8_t buffer[BUFFER_MAX_MESSAGE_SIZE];
   uint8_t crc;
 };
 
-typedef void (*CommunicationCommandFunctionPtr)(unsigned long timestamp, unsigned long deltaElapsed, CommuicationMessageStruct communication);
-typedef void (*CommunicationHandlerFunctionPtr)(unsigned long timestamp, unsigned long deltaElapsed, CommuicationMessageStruct communication);
+typedef void (*CommunicationCommandFunctionPtr)(unsigned long timestamp, unsigned long deltaElapsed, CommunicationMessageStruct communication);
+typedef void (*CommunicationHandlerFunctionPtr)(unsigned long timestamp, unsigned long deltaElapsed, CommunicationMessageStruct communication);
 
 struct CommunicationCommandFunctionEntry {
     uint16_t command;
