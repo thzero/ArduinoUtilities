@@ -10,6 +10,8 @@ extern void convertPrintByteArrayUnsignedLong(uint8_t *byteArray);
 extern void convertPrintUnsignedByteArrayUnsignedLong(uint8_t *byteArray);
 extern void convertUnsignedIntToByteArray(unsigned int value, uint8_t *byteArray);
 extern void convertUnsignedLongToByteArray(unsigned long value, uint8_t *byteArray);
+extern int convertUnsignedByteArrayToInt(uint8_t *byteArray);
+extern uint16_t convertUnsignedByteArrayToShort(uint8_t *byteArray);
 extern unsigned int convertUnsignedByteArrayToUnsignedInt(uint8_t *byteArray);
 extern unsigned long convertUnsignedByteArrayToUnsignedLong(uint8_t *byteArray);
 extern uint16_t convertUnsignedByteArrayToUnsignedShort(uint8_t *byteArray);
