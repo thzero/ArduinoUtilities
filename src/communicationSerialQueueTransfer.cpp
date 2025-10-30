@@ -8,7 +8,7 @@
 CommunicationSerialQueueTransfer::CommunicationSerialQueueTransfer() {
 }
 
-int CommunicationSerialQueueTransfer::_process(CommuicationMessageStruct& message, unsigned long timestamp, unsigned long delta) {
+int CommunicationSerialQueueTransfer::_process(CommunicationMessageStruct& message, unsigned long timestamp, unsigned long delta) {
   // uint16_t sendSize = 0;
   // sendSize = _transfer.txObj(message.command, sendSize);
   // sendSize = _transfer.txObj(message.size, sendSize);
@@ -22,7 +22,7 @@ int CommunicationSerialQueueTransfer::_process(CommuicationMessageStruct& messag
   return sendSize;
 }
 
-bool CommunicationSerialQueueTransfer::_read(CommuicationMessageStruct* communication, unsigned long timestamp, unsigned long delta) {
+bool CommunicationSerialQueueTransfer::_read(CommunicationMessageStruct* communication, unsigned long timestamp, unsigned long delta) {
   if (communication == nullptr)
     return false;
   if (_transfer.available() <= 0)
@@ -62,7 +62,7 @@ bool CommunicationSerialQueueTransfer::_read(CommuicationMessageStruct* communic
   return true;
 }
 
-int CommunicationSerialQueueTransfer::_send(CommuicationMessageStruct& message) {
+int CommunicationSerialQueueTransfer::_send(CommunicationMessageStruct& message) {
   uint16_t sendSize = _transfer.txObj(message.buffer, 0, message.size);
   _transfer.sendData(sendSize, message.command);
 
