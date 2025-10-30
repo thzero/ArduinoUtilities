@@ -17,7 +17,21 @@ int CommunicationSerialQueueTransfer::_process(CommunicationMessageStruct& messa
   // Serial.printf(F("communication-serial-transfer-process: message bytes sent: "));
   // Serial.printf(F("%d\n"), sendSize);
 
+#ifdef DEBUG_COMMUNICATION_SERIAL_PROCESS
+  Serial.printf(F("communication-serial-process-transfer: message command to send: %d\n"), message.command);
+  Serial.printf(F("communication-serial-process-transfer: message bytes size to send: %d\n"), sendSize);
+
+  Serial.println(F("communication-serial-process-transfer: message bytes to send: "));
+  for (size_t i = 0; i < message.size; i++)
+      Serial.printf(F("%d "), message.buffer[i]);
+  Serial.println();
+#endif
+
   _transfer.sendData(sendSize, message.command);
+
+#ifdef DEBUG_COMMUNICATION_SERIAL_PROCESS
+  Serial.println(F("communication-serial-process-transfer: sent buffer."));
+#endif
 
   return sendSize;
 }
@@ -29,34 +43,41 @@ bool CommunicationSerialQueueTransfer::_read(CommunicationMessageStruct* communi
     return false;
 
 #ifdef DEBUG_COMMUNICATION_SERIAL_READ
-  Serial.print("DEBUG_COMMUNICATION_SERIAL_READ: ");
-  Serial.println(DEBUG_COMMUNICATION_SERIAL_READ);
+  bool debug = false;
+  debug = true;
+  if (_transfer.currentCommand() == 1)
+    debug = false;
 #endif
 
   communication->command = _transfer.currentCommand();
 #ifdef DEBUG_COMMUNICATION_SERIAL_READ
-  Serial.printf(F("communication-serial-transfer-_read: message command received: %d %d %d\n"), communication->command, _transfer.currentCommand(), (communication->command == _transfer.currentCommand()));
+  if (debug)
+    Serial.printf(F("communication-serial-transfer-_read: message command received: %d %d %d\n"), communication->command, _transfer.currentCommand(), (communication->command == _transfer.currentCommand()));
 #endif
   communication->size = _transfer.currentReceived();
 #ifdef DEBUG_COMMUNICATION_SERIAL_READ
-  Serial.printf(F("communication-serial-transfer-_read: message bytes to receive: %d\n"), communication->size);
+  if (debug)
+    Serial.printf(F("communication-serial-transfer-_read: message bytes to receive: %d\n"), communication->size);
 #endif
 //     uint16_t recSize = 0;  // bytes we've processed from the receive buffer
 //     recSize = _transfer.rxObj(communication->size, sizeof(size_t));
 #ifdef DEBUG_COMMUNICATION_SERIAL_READ
-  Serial.printf(F("communication-serial-transfer-_read: message bytes to receive: %d\n"), communication->size);
+ if (debug)
+    Serial.printf(F("communication-serial-transfer-_read: message bytes to receive: %d\n"), communication->size);
 #endif
   // recSize = _transfer.rxObj(communication->buffer, recSize, communication->size);
   _transfer.rxObj(communication->buffer, 0, communication->size);
   
 #ifdef DEBUG_COMMUNICATION_SERIAL_READ
-  Serial.printf(F("communication-serial-transfer-_read: message bytes received: %d\n"), communication->size);
-  Serial.printf(F("communication-serial-transfer-_read: message bytes received: "));
-  for (size_t i = 0; i < communication->size; i++)
-      Serial.printf(F("%d "), communication->buffer[i]);
-  Serial.println();
-  Serial.printf(F("communication-serial-transfer-_read: message command: %d\n"), communication->command);
-  Serial.printf(F("communication-serial-transfer-_read: message size: %d\n"), communication->size);
+  if (debug) {
+    Serial.printf(F("communication-serial-transfer-_read: message bytes received: %d\n"), communication->size);
+    Serial.printf(F("communication-serial-transfer-_read: message bytes received: "));
+    for (size_t i = 0; i < communication->size; i++)
+        Serial.printf(F("%d "), communication->buffer[i]);
+    Serial.println();
+    Serial.printf(F("communication-serial-transfer-_read: message command: %d\n"), communication->command);
+    Serial.printf(F("communication-serial-transfer-_read: message size: %d\n"), communication->size);
+  }
 #endif
 
   return true;
@@ -71,6 +92,13 @@ int CommunicationSerialQueueTransfer::_send(CommunicationMessageStruct& message)
 
 bool CommunicationSerialQueueTransfer::_setup(HardwareSerial& serial, bool debug) {
   CommunicationSerialQueue::_setup(serial, debug);
-  _transfer.begin(serial, debug);
+  int debugV = debug;
+#if defined(DEBUG_COMMUNICATION_SERIAL_INTERNAL) && defined(DEBUG_COMMUNICATION_SERIAL_PROCESS)
+  debugV = 2;
+#endif
+#if defined(DEBUG_COMMUNICATION_SERIAL_INTERNAL) && defined(DEBUG_COMMUNICATION_SERIAL_READ)
+  debugV = 3;
+#endif
+  _transfer.begin(serial, debugV);
   return true;
 }
