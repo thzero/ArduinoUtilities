@@ -47,13 +47,13 @@ class CommunicationSerialQueue: public CommunicationSerial {
     }
     
   protected:
-    virtual int _process(CommuicationMessageStruct& message, unsigned long timestamp, unsigned long delta);
+    virtual int _process(CommunicationMessageStruct& message, unsigned long timestamp, unsigned long delta);
 #if !defined(TEENSYDUINO)
     bool _setup(HardwareSerial& serial, bool debug) override;
 #endif
     
   private:
-    CircularQueue<CommuicationMessageStruct, COMMUNICATION_QUEUE_LENGTH> _queueing;
+    CircularQueue<CommunicationMessageStruct, COMMUNICATION_QUEUE_LENGTH> _queueing;
 
     #if defined(ESP32)
     SemaphoreHandle_t _communicationSerialMutexOutput;

@@ -115,7 +115,7 @@ void CommunicationSerial::initCommand(uint16_t command, CommunicationCommandFunc
 }
 
 size_t CommunicationSerial::read(CommunicationHandlerFunctionPtr func, unsigned long timestamp, unsigned long delta) {
-  CommuicationMessageStruct communication;
+  CommunicationMessageStruct communication;
   bool available = _read(&communication, timestamp, delta);
   if (!available)
     return 0;
@@ -129,7 +129,7 @@ size_t CommunicationSerial::read(CommunicationHandlerFunctionPtr func, unsigned 
 #endif
 
   if (communication.command == COMMAND_COMMUNICATION_HEALTH) {
-#ifdef DEBUG_COMMUNICATION_READ_HEALTH
+#ifdef DEBUG_COMMUNICATION_SERIAL_READ_HEALTH
     Serial.println(F("communication-serial-read: received health request..."));
 #endif
     _health = true;
@@ -159,7 +159,7 @@ int CommunicationSerial::send(uint16_t command) {
   Serial.printf(F("%d\n"), command);
 #endif
 
-  CommuicationMessageStruct message;
+  CommunicationMessageStruct message;
   uint8_t byteArray[1];
   byteArray[1] = 0;
   memcpy(message.buffer, byteArray, 1);
@@ -183,11 +183,11 @@ int CommunicationSerial::send(uint16_t command) {
   return _send(message);
 }
 
-bool CommunicationSerial::_read(CommuicationMessageStruct* communication, unsigned long timestamp, unsigned long delta) {
+bool CommunicationSerial::_read(CommunicationMessageStruct* communication, unsigned long timestamp, unsigned long delta) {
   return false;
 }
 
-int CommunicationSerial::_send(CommuicationMessageStruct& message) {
+int CommunicationSerial::_send(CommunicationMessageStruct& message) {
   return 0;
 }
 

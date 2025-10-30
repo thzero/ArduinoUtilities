@@ -40,6 +40,28 @@ void convertPrintUnsignedByteArrayUnsignedLong(uint8_t *byteArray) {
   Serial.println();
 }
 
+int convertUnsignedByteArrayToInt(uint8_t *byteArray) {
+  int value = 0;
+  for (size_t i = 0; i < sizeof(int); i++) {
+    // Serial.printf("%d ", byteArray[i]);
+    // Serial.printf("b%d \n", (uint8_t)byteArray[i]);
+    value |= byteArray[i] << (i * 8); // Combine bytes
+  }
+  // Serial.println();
+  return value;
+}
+
+uint16_t convertUnsignedByteArrayToShort(uint8_t *byteArray) {
+  uint16_t value = 0;
+  for (size_t i = 0; i < sizeof(uint16_t); i++) {
+    // Serial.printf("%d ", byteArray[i]);
+    // Serial.printf("b%d \n", (uint8_t)byteArray[i]);
+    value |= byteArray[i] << (i * 8); // Combine bytes
+  }
+  // Serial.println();
+  return value;
+}
+
 unsigned int convertUnsignedByteArrayToUnsignedInt(uint8_t *byteArray) {
   unsigned int value = 0;
   for (size_t i = 0; i < sizeof(unsigned int); i++) {
@@ -54,6 +76,17 @@ unsigned int convertUnsignedByteArrayToUnsignedInt(uint8_t *byteArray) {
 unsigned long convertUnsignedByteArrayToUnsignedLong(uint8_t *byteArray) {
   unsigned long value = 0;
   for (size_t i = 0; i < sizeof(unsigned long); i++) {
+    // Serial.printf("%d ", byteArray[i]);
+    // Serial.printf("b%d \n", (uint8_t)byteArray[i]);
+    value |= byteArray[i] << (i * 8); // Combine bytes
+  }
+  // Serial.println();
+  return value;
+}
+
+uint16_t convertUnsignedByteArrayToUnsignedShort(uint8_t *byteArray) {
+  unsigned long value = 0;
+  for (size_t i = 0; i < sizeof(uint16_t); i++) {
     // Serial.printf("%d ", byteArray[i]);
     // Serial.printf("b%d \n", (uint8_t)byteArray[i]);
     value |= byteArray[i] << (i * 8); // Combine bytes

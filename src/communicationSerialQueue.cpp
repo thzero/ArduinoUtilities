@@ -40,7 +40,7 @@ int CommunicationSerialQueue::process(unsigned long timestamp, unsigned long del
 
 // TODO: stuff as many queued messages as will fit in the BUFFER_MAX_SIZE buffer using the START_BYTE as demarkation
 
-  CommuicationMessageStruct message = _queueing.front();
+  CommunicationMessageStruct message = _queueing.front();
   _queueing.dequeue();
 
 #ifdef DEBUG_COMMUNICATION_SERIAL_PROCESS
@@ -115,7 +115,7 @@ int CommunicationSerialQueue::queue(uint16_t command) {
     return -2; // exceeded queue length
   }
 
-  CommuicationMessageStruct message;
+  CommunicationMessageStruct message;
   uint8_t byteArray[1];
   byteArray[1] = 0;
   memcpy(message.buffer, byteArray, 1);
@@ -124,7 +124,7 @@ int CommunicationSerialQueue::queue(uint16_t command) {
 
 #ifdef DEBUG_COMMUNICATION_SERIAL_QUEUE
   Serial.printf(F("communication-serial-queue: message command to send: %d\n"), message.command);
-  Serial.printf(F("communication-serial-queue: message size to send: %d\n"), message.size);
+  Serial.printf(F("communication-serial-queue: message size to queue: %d\n"), message.size);
   Serial.println(F("communication-serial-queue: message bytes: "));
   for (size_t i = 0; i < message.size; i++)
       Serial.printf(F("%d "), message.buffer[i]);
@@ -169,7 +169,7 @@ int CommunicationSerialQueue::queue(uint16_t command, uint8_t *byteArray, size_t
   Serial.println();
 #endif
 
-  CommuicationMessageStruct message;
+  CommunicationMessageStruct message;
   memcpy(message.buffer, byteArray, size);
   message.size = size;
   message.command = command;
@@ -221,7 +221,7 @@ int CommunicationSerialQueue::queue(uint16_t command, uint8_t *byteArray, size_t
   return 1;
 }
 
-int CommunicationSerialQueue::_process(CommuicationMessageStruct& message, unsigned long timestamp, unsigned long delta) {
+int CommunicationSerialQueue::_process(CommunicationMessageStruct& message, unsigned long timestamp, unsigned long delta) {
   return 0;
 }
 

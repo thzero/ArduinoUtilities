@@ -217,4 +217,29 @@ void initializeBuffers(uint8_t *tx, uint8_t *rx, size_t size, size_t offset)
     }
 }
 
+// https://github.com/sstaub/TeensyID
+#if defined ARDUINO_TEENSY40 || defined ARDUINO_TEENSY41
+void fetchMAC(uint8_t *mac) { // there are 2 MAC addresses each 48bit 
+  uint32_t m1 = HW_OCOTP_MAC1;
+  uint32_t m2 = HW_OCOTP_MAC0;
+  mac[0] = m1 >> 8;
+  mac[1] = m1 >> 0;
+  mac[2] = m2 >> 24;
+  mac[3] = m2 >> 16;
+  mac[4] = m2 >> 8;
+  mac[5] = m2 >> 0;
+}
+#else
+void fetchMAC(uint8_t *mac) {
+  uint8_t serial[4];
+  teensySN(serial);
+  mac[0] = 0x04;
+  mac[1] = 0xE9;
+  mac[2] = 0xE5;
+  mac[3] = serial[1];
+  mac[4] = serial[2];
+  mac[5] = serial[3];
+}
+#endif
+
 #endif

@@ -8,8 +8,6 @@
 // #define DEBUG_COMMUNICATION_SERIAL
 // #define DEBUG_COMMUNICATION_SERIAL_COMMAND
 // #define DEBUG_COMMUNICATION_SERIAL_INTERNAL
-// #define DEBUG_COMMUNICATION_SERIAL_PROCESS
-// #define DEBUG_COMMUNICATION_SERIAL_QUEUE
 // #define DEBUG_COMMUNICATION_SERIAL_READ
 // #define DEBUG_COMMUNICATION_SERIAL_READ_HEALTH
 // #define DEBUG_COMMUNICATION_SERIAL_SEND
@@ -31,8 +29,8 @@ class CommunicationSerial {
     
   protected:
     virtual bool _setup(HardwareSerial& serial, bool debug);
-    virtual bool _read(CommuicationMessageStruct* communication, unsigned long timestamp, unsigned long delta);
-    virtual int _send(CommuicationMessageStruct& message);
+    virtual bool _read(CommunicationMessageStruct* communication, unsigned long timestamp, unsigned long delta);
+    virtual int _send(CommunicationMessageStruct& message);
 
     bool _health = false;
     uint16_t _healthMs = 0;

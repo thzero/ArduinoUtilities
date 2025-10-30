@@ -11,10 +11,10 @@ class CommunicationSerialQueueTransfer: public CommunicationSerialQueue {
     CommunicationSerialQueueTransfer();
     
   protected:
-    int _process(CommuicationMessageStruct& message, unsigned long timestamp, unsigned long delta) override;
+    int _process(CommunicationMessageStruct& message, unsigned long timestamp, unsigned long delta) override;
     bool _setup(HardwareSerial& serial, bool debug) override;
-    bool _read(CommuicationMessageStruct* communication, unsigned long timestamp, unsigned long delta) override;
-    int _send(CommuicationMessageStruct& message) override;
+    bool _read(CommunicationMessageStruct* communication, unsigned long timestamp, unsigned long delta) override;
+    int _send(CommunicationMessageStruct& message) override;
     
   private:
     SerialTransfer _transfer;
