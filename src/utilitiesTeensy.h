@@ -22,6 +22,8 @@ extern void initializeBuffers(uint8_t *tx, uint8_t *rx, size_t size, size_t offs
 
 extern void fetchMAC(uint8_t *mac);
 
+extern void reboot();
+
 #endif
 
 #endif
