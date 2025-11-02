@@ -10,9 +10,9 @@ class fileSystemLFS: public fileSystemBase {
   public:
     fileSystemLFS();
     File openFile(char* path) override;
-    bool setup();
-    long totalBytes();
-    long usedBytes();
+    bool setup() override;
+    long totalBytes() override;
+    long usedBytes() override;
 };
 
 #endif
