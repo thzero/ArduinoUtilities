@@ -1,8 +1,6 @@
 #ifndef _BUZZER_H
 #define _BUZZER_H
 
-#include <Arduino.h>
-
 #define NOTE_B0  31
 #define NOTE_C1  33
 #define NOTE_CS1 35

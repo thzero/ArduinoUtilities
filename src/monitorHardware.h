@@ -1,17 +1,15 @@
 #ifndef _MONITOR_H
 #define _MONITOR_H
 
-#include <Arduino.h>
-
 #include "monitorHardwareBase.h"
 
 class monitorHardware {
   public:
     monitorHardware();
-    byte setup(monitorHardwareBase* instance, uint32_t voltagePin);
-    byte monitorCPUTemp();
-    byte monitorMemory();
-    byte monitorVoltage();
+    int8_t setup(monitorHardwareBase* instance, uint32_t voltagePin);
+    int8_t monitorCPUTemp();
+    int8_t monitorMemory();
+    int8_t monitorVoltage();
     float cpuTemp();
     float cpuTempMax();
     int memoryHeap();

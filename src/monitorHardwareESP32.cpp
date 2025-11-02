@@ -8,11 +8,11 @@
 monitorHardwareESP32::monitorHardwareESP32() {
 }
 
-byte monitorHardwareESP32::monitorCPUTemp() {
+int8_t monitorHardwareESP32::monitorCPUTemp() {
   return 0;
 }
 
-byte monitorHardwareESP32::monitorMemory() {
+int8_t monitorHardwareESP32::monitorMemory() {
   _memoryHeap = esp_get_free_heap_size();
   _memoryHeapInternal = esp_get_free_internal_heap_size();
   _memoryHeapMinimum = esp_get_minimum_free_heap_size();
@@ -20,7 +20,7 @@ byte monitorHardwareESP32::monitorMemory() {
   return 0;
 }
 
-byte monitorHardwareESP32::monitorVoltage() {
+int8_t monitorHardwareESP32::monitorVoltage() {
   // Voltage in volts not mv, using a 1:1 divider so 500 division.
   _voltage = _voltage_filter.filter(analogReadMilliVolts(10) / 500);
 

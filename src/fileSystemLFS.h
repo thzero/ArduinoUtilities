@@ -1,7 +1,6 @@
 #ifndef _FILESYSTEM_LFS_H
 #define _FILESYSTEM_LFS_H
 
-#include <Arduino.h>
 #include <FS.h>
 
 #include "fileSystemBase.h"

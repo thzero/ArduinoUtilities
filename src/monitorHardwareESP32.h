@@ -9,9 +9,9 @@
 class monitorHardwareESP32 : public monitorHardwareBase {
   public:
     monitorHardwareESP32();
-    byte monitorCPUTemp() override;
-    byte monitorMemory() override;
-    byte monitorVoltage() override;
+    int8_t monitorCPUTemp() override;
+    int8_t monitorMemory() override;
+    int8_t monitorVoltage() override;
     
   protected:
     void setupInternal() override;

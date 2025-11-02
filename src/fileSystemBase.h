@@ -1,7 +1,6 @@
 #ifndef _FILESYSTEM_BASE_H
 #define _FILESYSTEM_BASE_H
 
-#include <Arduino.h>
 #include <FS.h>
 
 class fileSystemBase {

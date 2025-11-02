@@ -1,9 +1,11 @@
+#include <Arduino.h>
+
 #include "monitorHardware.h"
 
 monitorHardware::monitorHardware() {
 }
 
-byte monitorHardware::setup(monitorHardwareBase* instance, uint32_t voltagePin) {
+int8_t monitorHardware::setup(monitorHardwareBase* instance, uint32_t voltagePin) {
     _instance = instance;
     _instance->setup(voltagePin);
     _instance->monitorCPUTemp();
@@ -13,15 +15,15 @@ byte monitorHardware::setup(monitorHardwareBase* instance, uint32_t voltagePin) 
     return 0;
 }
 
-byte monitorHardware::monitorCPUTemp() {
+int8_t monitorHardware::monitorCPUTemp() {
     return _instance->monitorCPUTemp();
 }
 
-byte monitorHardware::monitorMemory() {
+int8_t monitorHardware::monitorMemory() {
     return _instance->monitorMemory();
 }
 
-byte monitorHardware::monitorVoltage() {
+int8_t monitorHardware::monitorVoltage() {
     return _instance->monitorVoltage();
 }
 

@@ -1,3 +1,5 @@
+#include <Arduino.h>
+
 #include "buzzer.h"
 
 void buzzer::off() {

@@ -22,7 +22,7 @@ extern uint32_t external_psram_size;
 monitorHardwareTeensy::monitorHardwareTeensy() {
 }
 
-byte monitorHardwareTeensy::monitorCPUTemp() {
+int8_t monitorHardwareTeensy::monitorCPUTemp() {
   // Serial.printf("monitorCPUTemp3: %f\n", _cpuTemp);
   _cpuTemp = _cpuTemp_filter.filter(tempmonGetTemp());
   // Serial.printf("cpuTemp5: %d\n", _cpuTemp);
@@ -36,7 +36,7 @@ byte monitorHardwareTeensy::monitorCPUTemp() {
   return 0;
 }
 
-byte monitorHardwareTeensy::monitorMemory() {
+int8_t monitorHardwareTeensy::monitorMemory() {
   // constexpr auto RAM_BASE   = 0x2020'0000;
   // constexpr auto RAM_SIZE   = 512 << 10;
   // constexpr auto FLASH_BASE = 0x6000'0000;
@@ -96,7 +96,7 @@ byte monitorHardwareTeensy::monitorMemory() {
   return 0;
 }
 
-byte monitorHardwareTeensy::monitorVoltage() {
+int8_t monitorHardwareTeensy::monitorVoltage() {
   _voltage = _voltage_filter.filter(analogRead(_voltagePin));
 
   // float vin = 0.0;
