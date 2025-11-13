@@ -13,9 +13,9 @@
 class monitorHardwareTeensy : public monitorHardwareBase {
   public:
     monitorHardwareTeensy();
-    byte monitorCPUTemp() override;
-    byte monitorMemory() override;
-    byte monitorVoltage() override;
+    int8_t monitorCPUTemp() override;
+    int8_t monitorMemory() override;
+    int8_t monitorVoltage() override;
     
   protected:
     void setupInternal() override; 

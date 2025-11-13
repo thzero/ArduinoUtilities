@@ -1,16 +1,15 @@
 #ifndef _MONITOR_BASE_H
 #define _MONITOR_BASE_H
 
-#include <Arduino.h>
-
+#include <stdint.h>
 #include "ewma.h"
 
 class monitorHardwareBase {
   public:
     void setup(uint32_t voltagePin);
-    virtual byte monitorCPUTemp();
-    virtual byte monitorMemory();
-    virtual byte monitorVoltage();
+    virtual int8_t monitorCPUTemp();
+    virtual int8_t monitorMemory();
+    virtual int8_t monitorVoltage();
     float cpuTemp();
     float cpuTempMax();
     int memoryHeap();

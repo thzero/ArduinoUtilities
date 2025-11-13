@@ -1,3 +1,5 @@
+#include <Arduino.h>
+
 #include "monitorHardwareBase.h"
 
 void monitorHardwareBase::setup(uint32_t voltagePin) {
@@ -10,15 +12,15 @@ void monitorHardwareBase::setupInternal() {
   Serial.println(F("...monitor finished."));
 }
 
-byte monitorHardwareBase::monitorCPUTemp() {
+int8_t monitorHardwareBase::monitorCPUTemp() {
   return 0;
 }
 
-byte monitorHardwareBase::monitorMemory() {
+int8_t monitorHardwareBase::monitorMemory() {
   return 0;
 }
 
-byte monitorHardwareBase::monitorVoltage() {
+int8_t monitorHardwareBase::monitorVoltage() {
   return 0;
 }
 

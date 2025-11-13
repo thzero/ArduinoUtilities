@@ -242,4 +242,10 @@ void fetchMAC(uint8_t *mac) {
 }
 #endif
 
+void reboot() {
+    USB1_USBCMD = 0; // disconnect USB
+    delay(50);       // enough time for USB hubs/ports to detect disconnect
+    SCB_AIRCR = 0x05FA0004;
+}
+
 #endif

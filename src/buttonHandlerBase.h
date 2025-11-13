@@ -1,7 +1,6 @@
 #ifndef _BUTTON_BASE_H
 #define _BUTTON_BASE_H
 
-#include <Arduino.h>
 #include <Button2.h>
 
 class buttonHandlerBase {
