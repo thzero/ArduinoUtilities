@@ -23,6 +23,7 @@ extern void debug(char str[], unsigned int value);
 ///////
 /// F macro for constant string literals used serial output.
 ///////
+extern void debug();
 extern void debug(const __FlashStringHelper *ifsh);
 extern void debug(const __FlashStringHelper *ifsh, char value[]);
 extern void debug(const __FlashStringHelper *ifsh, double value);

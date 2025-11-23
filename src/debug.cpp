@@ -76,6 +76,12 @@ void debug(char str[], unsigned long value) {
 ///////
 /// F macro
 ///////
+void debug() {
+#if defined(DEBUG) || defined(DEBUG_INTERNAL)
+  Serial.println(F(""));
+#endif
+}
+
 void debug(const __FlashStringHelper *ifsh) {
 #if defined(DEBUG) || defined(DEBUG_INTERNAL)
   Serial.println(reinterpret_cast<const char *>(ifsh));
