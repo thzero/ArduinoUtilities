@@ -141,6 +141,23 @@ void convertUnsignedLongToUnsignedByteArray(unsigned long value, uint8_t *byteAr
   // Serial.println();
 }
 
+size_t intToArray(long number, uint16_t *arr) {
+  long temp = number;
+  size_t count = 0;
+  while (temp > 0) {
+    temp /= 10;
+    count++;
+  }
+
+  // Extract digits and store them in reverse order
+  for (int i = count - 1; i >= 0; i--) {
+    arr[i] = number % 10;
+    number /= 10;
+  }
+
+  return count;
+}
+
 unsigned int msgChk(char * buffer, long length) {
   long index;
   unsigned int checksum;

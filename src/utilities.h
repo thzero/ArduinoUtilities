@@ -20,6 +20,8 @@ extern void convertUnsignedLongToUnsignedByteArray(unsigned long value, uint8_t 
 
 extern void feedWatchdog();
 
+extern size_t intToArray(long number, uint16_t *arr) ;
+
 extern unsigned int msgChk(char * buffer, long length);
 
 void printFloat(float val, bool valid, int len, int prec);
