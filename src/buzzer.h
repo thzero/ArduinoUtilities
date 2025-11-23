@@ -90,13 +90,33 @@
 #define NOTE_CS8 4435
 #define NOTE_D8  4699
 #define NOTE_DS8 4978
+#define REST      0
+
+#define BUZZER_BUFFER_LENGTH 512
 
 class buzzer {
   public:
     void setup(char name, int pin);
+    bool melody(unsigned long delta);
+    void melodyInit(uint16_t *melody, int16_t *noteDurations, size_t length, uint16_t *notePauseTimes = nullptr, uint16_t tempo = 0);
+    void melodyReset();
+    void melodyStart();
+    bool melodyStatus();
+    void melodyStop();
     void off();
     void on(int toneValue);
+    bool status();
   private:
+    uint16_t _melody[BUZZER_BUFFER_LENGTH];
+    bool _meldoyHasNotePauseTimes;
+    int16_t _melodyNoteDurations[BUZZER_BUFFER_LENGTH];
+    size_t _melodyLength;
+    size_t _melodyIndex;
+    unsigned long _melodyNotePauseTime;
+    uint16_t _melodyNotePauseTimes[BUZZER_BUFFER_LENGTH];
+    int16_t _melodyState = -1;
+    uint16_t _melodyTempo;
+    unsigned long _melodyTime;
     char _name;
     int _pin;
     bool _status;
