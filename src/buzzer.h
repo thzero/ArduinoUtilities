@@ -104,7 +104,7 @@ class buzzer {
     bool melodyStatus();
     void melodyStop();
     void off();
-    void on(int toneValue);
+    void on(int toneValue, int duration = 0);
     bool status();
   private:
     uint16_t _melody[BUZZER_BUFFER_LENGTH];
