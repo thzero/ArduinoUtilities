@@ -222,7 +222,7 @@ void buzzer::off() {
   melodyStop();
 }
 
-void buzzer::on(int toneValue, int duration = 0) {
+void buzzer::on(int toneValue, int duration) {
   melodyStop();
   if (duration > 0)
     tone(_pin, toneValue, duration);
