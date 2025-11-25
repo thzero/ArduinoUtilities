@@ -9,7 +9,9 @@ class buttonHandlerBase {
     void loop();
     void setup(char name, int pin);
     virtual void click(Button2 button);
+    virtual void doubleClick(Button2 button);
     virtual void longClick(Button2 button);
+    virtual void tripleClick(Button2 button);
     char name();
   private:
     Button2 _btn;
